@@ -354,7 +354,12 @@ public interface CLIJxPlugins {
             FloodFillDiamond.class,
             BinaryFillHoles.class,
             ConnectedComponentsLabelingDiamond.class,
-            ConnectedComponentsLabelingBox.class
+            ConnectedComponentsLabelingBox.class,
+            SetRandom.class,
+            InvalidateKernelCache.class,
+            EntropyBox.class,
+            PushTile.class,
+            PullTile.class
     };
 
     public String blockList = ";" +

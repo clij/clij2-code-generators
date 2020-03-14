@@ -46,7 +46,7 @@ public class OpGenerator {
             for (Class klass : CLIJxPlugins.classes) {
                 if (
                         (isCLIJ2 && klass.getPackage().toString().contains(".clij2.")) ||
-                        ((!isCLIJ2) && klass.getPackage().toString().contains(".clijx."))
+                        ((!isCLIJ2) && (klass.getPackage().toString().contains(".clijx.") || klass.getSimpleName().equals("Kernels")))
                 ) {
                     builder.append("import " + klass.getName() + ";\n");
                 }
