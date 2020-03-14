@@ -8,13 +8,13 @@
 	<parent>
 		<groupId>net.haesleinhuepf</groupId>
 		<artifactId>clij-parent-pom</artifactId>
-		<version>1.4.6</version>
+		<version>1.4.7</version>
 		<relativePath />
 	</parent>
 
 	<groupId>net.haesleinhuepf</groupId>
 	<artifactId>clij2-code_generators_</artifactId>
-	<version>0.24.0</version>
+	<version>0.25.0</version>
 
 	<name>clij2-code_generators_</name>
 	<description>clij2-code_generators</description>
