@@ -184,7 +184,13 @@ public class DocumentationGenerator {
             builder.append("\n\n");
             builder.append("### Usage in ImageJ macro\n");
             builder.append("```\n");
-            builder.append("Ext.CLIJ" + (item.klass == Kernels.class?"":"x") + "_" + item.methodName + "(" + item.parametersMacro + ");\n");
+            builder.append("Ext.CLIJ");
+            if (item.klass.getPackage().toString().contains(".clij2.")) {
+                builder.append("2");
+            } else if (item.klass != Kernels.class) {
+                builder.append("x");
+            }
+            builder.append("_" + item.methodName + "(" + item.parametersMacro + ");\n");
             builder.append("```\n");
             builder.append("\n\n");
             builder.append("### Usage in Java\n");
@@ -242,13 +248,13 @@ public class DocumentationGenerator {
         String clijObjectName;
 
         if (isCLIJ2) {
-            code.append("import net.haesleinhuepf.clij2.CLIJ;\n");
+            code.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
             code.append("import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;\n");
             code.append("CLIJ2 clij2 = CLIJ2.getInstance();\n\n");
 
             clijObjectName = "clij2";
         } else {
-            code.append("import net.haesleinhuepf.clijx.CLIJ;\n");
+            code.append("import net.haesleinhuepf.clijx.CLIJx;\n");
             code.append("import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;\n");
             code.append("CLIJx clijx = CLIJx.getInstance();\n\n");
 
