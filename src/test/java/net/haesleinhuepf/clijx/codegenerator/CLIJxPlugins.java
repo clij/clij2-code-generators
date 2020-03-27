@@ -359,7 +359,11 @@ public interface CLIJxPlugins {
             InvalidateKernelCache.class,
             EntropyBox.class,
             PushTile.class,
-            PullTile.class
+            PullTile.class,
+            ConcatenateStacks.class,
+            ResultsTableToImage2D.class,
+            GetAutomaticThreshold.class,
+            GetDimensions.class
     };
 
     public String blockList = ";" +
