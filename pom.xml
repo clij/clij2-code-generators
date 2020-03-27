@@ -8,13 +8,13 @@
 	<parent>
 		<groupId>net.haesleinhuepf</groupId>
 		<artifactId>clij-parent-pom</artifactId>
-		<version>1.4.7</version>
+		<version>1.5.6</version>
 		<relativePath />
 	</parent>
 
 	<groupId>net.haesleinhuepf</groupId>
 	<artifactId>clij2-code_generators_</artifactId>
-	<version>0.25.0</version>
+	<version>0.26.3</version>
 
 	<name>clij2-code_generators_</name>
 	<description>clij2-code_generators</description>
@@ -98,6 +98,11 @@
 		<dependency>
 			<groupId>net.haesleinhuepf</groupId>
 			<artifactId>clijx_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>Trainable_Segmentation_clijed</artifactId>
+			<version>3.2.35-clijed</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
