@@ -102,7 +102,7 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
             }
             methodListing.append("\n" + count + " methods listed.\n");
         }
-        String outputTarget = "clij12xAPIcomparison.md";
+        String outputTarget = "../clij2-docs/clij12xAPIcomparison.md";
         try {
             FileWriter writer = new FileWriter(outputTarget);
             writer.write(methodListing.toString());
