@@ -363,7 +363,8 @@ public interface CLIJxPlugins {
             ConcatenateStacks.class,
             ResultsTableToImage2D.class,
             GetAutomaticThreshold.class,
-            GetDimensions.class
+            GetDimensions.class,
+            CustomOperation.class
     };
 
     public String blockList = ";" +
