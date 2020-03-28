@@ -41,6 +41,9 @@ public class OpGenerator {
             builder.append("import ij.measure.ResultsTable;\n");
             builder.append("import ij.gui.Roi;\n");
             builder.append("import ij.plugin.frame.RoiManager;\n");
+            builder.append("import java.util.HashMap;\n");
+
+
 
 
             for (Class klass : CLIJxPlugins.classes) {
