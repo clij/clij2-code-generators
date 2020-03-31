@@ -36,19 +36,19 @@ public class CLIJxtGenerator {
                 //File outputTarget = new File(targetPath + name);
 
                 CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(name);
-                if (plugin instanceof ProcessableInTiles) {
+                if (plugin instanceof ProcessableInTiles && !plugin.getClass().isAnnotationPresent(Deprecated.class)) {
                     String fullClassName = plugin.getClass().getName();
                     String shortClassName = plugin.getClass().getSimpleName();
 
                     String newName = name.replace("CLIJ2_", "CLIJxt_").replace("CLIJx_", "CLIJxt_");
-                    System.out.println(newName);
+                    System.out.println(newName + " from " + plugin.getClass());
 
                     content = content.replace(fullClassToReplace, fullClassName);
                     content = content.replace(shortClassNameToReplace, shortClassName);
                     content = content.replace(nameToReplace, newName);
                     content = content.replace("\npublic class", "// this is generated code. See CLIJxtGenerator for details. \npublic class");
 
-                    System.out.println(content);
+                    //System.out.println(content);
 
                     File outputTarget = new File(targetPath + shortClassName + ".java");
 

@@ -1,5 +1,6 @@
 package net.haesleinhuepf.clijx.codegenerator;
 
+import net.haesleinhuepf.clij.macro.CLIJMacroPlugin;
 import net.haesleinhuepf.clij.macro.CLIJMacroPluginService;
 import org.scijava.Context;
 
@@ -29,9 +30,13 @@ public class CLIJ2WrapperGenerator {
                                 "public class " + className + " extends net.haesleinhuepf.clij2.plugins." + className + " {\n" +
                                 "}\n";
 
+                CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(pluginName);
+                if(plugin.getClass().isAnnotationPresent(Deprecated.class)) {
+                    template = template.replace("\npublic class", "\n@Deprecated\npublic class");
+                }
                 //System.out.println(template);
 
-                File outputTarget = new File("src/main/java/net/haesleinhuepf/clijx/clij2wrappers/" + className + ".java");
+                File outputTarget = new File("../clijx/src/main/java/net/haesleinhuepf/clijx/clij2wrappers/" + className + ".java");
 
                 try {
                     FileWriter writer = new FileWriter(outputTarget);
