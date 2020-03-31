@@ -46,6 +46,9 @@ import net.haesleinhuepf.clij2.plugins.LocalThreshold;
 import net.haesleinhuepf.clij2.plugins.GaussianBlur2D;
 import net.haesleinhuepf.clij2.plugins.GaussianBlur3D;
 import net.haesleinhuepf.clijx.plugins.BlurSliceBySlice;
+import net.haesleinhuepf.clijx.weka.*;
+import net.haesleinhuepf.clijx.weka.autocontext.ApplyAutoContextWekaModel;
+import net.haesleinhuepf.clijx.weka.autocontext.TrainAutoContextWekaModel;
 
 public interface CLIJxPlugins {
     public Class[] classes = {
@@ -364,7 +367,16 @@ public interface CLIJxPlugins {
             ResultsTableToImage2D.class,
             GetAutomaticThreshold.class,
             GetDimensions.class,
-            CustomOperation.class
+            CustomOperation.class,
+            ApplyAutoContextWekaModel.class,
+            TrainAutoContextWekaModel.class,
+            ApplyWekaModel.class,
+            ApplyWekaToTable.class,
+            GenerateFeatureStack.class,
+            //GenerateWekaProbabilityMaps.class,
+            TrainWekaModel.class,
+            TrainWekaFromTable.class,
+            TrainWekaModelWithOptions.class
     };
 
     public String blockList = ";" +

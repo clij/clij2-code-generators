@@ -100,9 +100,9 @@
 			<artifactId>clijx_</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>sc.fiji</groupId>
-			<artifactId>Trainable_Segmentation_clijed</artifactId>
-			<version>3.2.35-clijed</version>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-weka_</artifactId>
+			<version>0.26.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

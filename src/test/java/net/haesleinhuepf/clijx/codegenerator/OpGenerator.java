@@ -32,6 +32,7 @@ public class OpGenerator {
                 builder.append("package net.haesleinhuepf.clijx.utilities;\n");
                 builder.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
                 builder.append("import net.haesleinhuepf.clijx.CLIJx;\n");
+                builder.append("import net.haesleinhuepf.clijx.weka.CLIJxWeka2;\n");
             }
             builder.append("import net.haesleinhuepf.clij.CLIJ;\n");
             builder.append("import net.haesleinhuepf.clij.clearcl.ClearCLKernel;\n");
@@ -42,6 +43,9 @@ public class OpGenerator {
             builder.append("import ij.gui.Roi;\n");
             builder.append("import ij.plugin.frame.RoiManager;\n");
             builder.append("import java.util.HashMap;\n");
+            builder.append("import ij.ImagePlus;\n");
+
+
 
 
 
@@ -161,7 +165,11 @@ public class OpGenerator {
                             builder.append("    default " + returnType + " " + methodName + "(");
                             builder.append(parametersHeader);
                             builder.append(") {\n");
-                            builder.append("        return " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                            if (returnType.compareTo("void") == 0) {
+                                builder.append("        " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                            } else {
+                                builder.append("        return " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                            }
                             builder.append("    }\n\n");
 
                             methodCount++;
