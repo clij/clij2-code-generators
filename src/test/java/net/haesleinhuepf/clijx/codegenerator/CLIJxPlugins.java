@@ -376,7 +376,26 @@ public interface CLIJxPlugins {
             //GenerateWekaProbabilityMaps.class,
             TrainWekaModel.class,
             TrainWekaFromTable.class,
-            TrainWekaModelWithOptions.class
+            TrainWekaModelWithOptions.class,
+            StartContinuousWebcamAcquisition.class,
+            StopContinuousWebcamAcquisition.class,
+            CaptureWebcamImage.class,
+            ConvertRGBStackToGraySlice.class,
+            PullLabelsToROIList.class,
+            MeanOfTouchingNeighbors.class,
+            MinimumOfTouchingNeighbors.class,
+            MaximumOfTouchingNeighbors.class,
+            ResultsTableColumnToImage.class,
+            StatisticsOfBackgroundAndLabelledPixels.class,
+            GetGPUProperties.class,
+            GetSumOfAllPixels.class,
+            GetSorensenDiceCoefficient.class,
+            GetMinimumOfAllPixels.class,
+            GetMaximumOfAllPixels.class,
+            GetMeanOfAllPixels.class,
+            GetJaccardIndex.class,
+            GetCenterOfMass.class,
+            GetBoundingBox.class
     };
 
     public String blockList = ";" +
