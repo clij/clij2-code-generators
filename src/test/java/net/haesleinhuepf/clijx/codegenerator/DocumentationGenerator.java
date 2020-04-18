@@ -282,7 +282,8 @@ public class DocumentationGenerator {
             }
 
 
-            builder.append("[Back to CLIJ documentation](https://clij.github.io/)\n" +
+            builder.append("[Back to CLIJ2 reference](https://clij.github.io/clij2-docs/reference)\n" +
+                    "[Back to CLIJ2 documentation](https://clij.github.io/clij2-docs)\n" +
                     "\n" +
                     "[Imprint](https://clij.github.io/imprint)\n");
 
