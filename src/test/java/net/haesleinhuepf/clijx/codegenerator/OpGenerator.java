@@ -1,5 +1,6 @@
 package net.haesleinhuepf.clijx.codegenerator;
 
+import clojure.lang.Compiler;
 import net.haesleinhuepf.clij.CLIJ;
 import net.haesleinhuepf.clij.kernels.Kernels;
 import net.haesleinhuepf.clij.macro.CLIJMacroPlugin;
@@ -14,7 +15,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class OpGenerator {
     public static void main(String ... args) throws IOException {
@@ -44,11 +48,8 @@ public class OpGenerator {
             builder.append("import ij.plugin.frame.RoiManager;\n");
             builder.append("import java.util.HashMap;\n");
             builder.append("import ij.ImagePlus;\n");
-
-
-
-
-
+            builder.append("import java.util.List;\n");
+            builder.append("import java.util.ArrayList;\n");
 
             for (Class klass : CLIJxPlugins.classes) {
                 if (
@@ -83,7 +84,7 @@ public class OpGenerator {
                 ) {
                     builder.append("\n    // " + klass.getName() + "\n");
                     builder.append("    //----------------------------------------------------\n");
-                    for (Method method : klass.getMethods()) {
+                    for (Method method : sort(klass.getMethods())) {
                         if (Modifier.isStatic(method.getModifiers()) &&
                                 Modifier.isPublic(method.getModifiers()) &&
                                 method.getParameterCount() > 0 &&
@@ -192,6 +193,20 @@ public class OpGenerator {
         }
     }
 
+    public static Iterable<? extends Method> sort(Method[] methods) {
+        ArrayList<Method> methodList = new ArrayList<>();
+        for (int i = 0; i < methods.length; i++) {
+            methodList.add(methods[i]);
+        }
+        Collections.sort(methodList, new Comparator<Method>() {
+            @Override
+            public int compare(Method o1, Method o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
+        return methodList;
+    }
+
     static boolean blockListOk(Class klass, Method method) {
         String searchString = klass.getSimpleName() + "." + method.getName();
         if (CLIJxPlugins.blockList.contains(";" + searchString + ";")) {
@@ -212,16 +227,22 @@ public class OpGenerator {
         if (plugin != null) {
             String[] parameters = plugin.getParameterHelpText().split(",");
             if (parameters.length != parametersHeader.length) {
-          //      if(methodName.contains("paste"))
-            //    {
-              //      System.out.println("Leaving 1");
+                //if(methodName.contains("generate")) {
+                //          System.out.println("Leaving 1");
                 //}
                 return new String[0];
             }
             String[] parameterNames = new String[parametersHeader.length];
             for (int i = 0; i < parameters.length; i++) {
+                int parameterNameIndex = 1;
                 String typeA = parameters[i].trim().split(" ")[0];
+                if (typeA.toLowerCase().compareTo("byref") == 0) {
+                    typeA = parameters[i].trim().split(" ")[1];
+                    parameterNameIndex = 2;
+                }
+
                 String typeB = parametersHeader[i].trim().split(" ")[0];
+
 
                 if (
                         ((typeA.compareTo("String") == 0 || typeA.compareTo("Image") == 0) && (typeB.compareTo("ClearCLBuffer") == 0 || typeB.compareTo("ClearCLImage") == 0 || typeB.compareTo("ClearCLImageInterface") == 0)) ||
@@ -231,19 +252,19 @@ public class OpGenerator {
                                 (typeA.compareTo("Boolean") == 0 && typeB.compareTo("Boolean") == 0) ||
                                 (typeA.compareTo("String") == 0 && typeB.compareTo("String") == 0)
                 ) {
-                    parameterNames[i] = parameters[i].trim().split(" ")[1];
+                    parameterNames[i] = parameters[i].trim().split(" ")[parameterNameIndex ];
                 } else {
-                    //if(methodName.contains("paste"))
-                    //{
-                    //System.out.println("Leaving because " + methodName + "  " + typeA + " != " + typeB);
+
+                    //if(methodName.contains("generate")) {
+                    //    System.out.println("Leaving because " + methodName + "  " + typeA + " != " + typeB);
                     //}
                     return new String[0];
                 }
 
             }
-//            if(methodName.contains("paste")) {
-//                System.out.println(Arrays.toString(parameterNames));
-//            }
+            //if(methodName.contains("generate")) {
+            //    System.out.println(Arrays.toString(parameterNames));
+            //}
             return parameterNames;
         }
 //        if(methodName.contains("paste")) {

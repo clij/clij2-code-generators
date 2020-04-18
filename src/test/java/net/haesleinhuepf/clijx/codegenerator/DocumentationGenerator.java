@@ -40,9 +40,10 @@ public class DocumentationGenerator {
 
     private static boolean isCLIJ2;
     private static CLIJMacroPluginService service;
+    private static CombinedUsageStats combinedUsageStats;
 
     public static void main(String ... args) throws IOException {
-
+        combinedUsageStats = new CombinedUsageStats("../clij2-docs/src/main/macro/");
         service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
         boolean[] booleans = new boolean[]{false, true};
 
@@ -54,7 +55,7 @@ public class DocumentationGenerator {
 
             int methodCount = 0;
             for (Class klass : CLIJxPlugins.classes) {
-                for (Method method : klass.getMethods()) {
+                for (Method method : sort(klass.getMethods())) {
                     if (Modifier.isStatic(method.getModifiers()) &&
                             Modifier.isPublic(method.getModifiers()) &&
                             method.getParameterCount() > 0 &&
@@ -68,6 +69,10 @@ public class DocumentationGenerator {
                         String returnType = typeToString(method.getReturnType());
                         String parametersHeader = "";
                         String parametersCall = "";
+
+                        //if (methodName.startsWith("generate")) {
+                        //    System.out.println("Reading " + methodName);
+                        //}
 
                         for (Parameter parameter : method.getParameters()) {
                             if (parametersCall.length() == 0) { // first parameter
@@ -116,12 +121,24 @@ public class DocumentationGenerator {
                             item.parametersCall = parametersCall;
                             item.returnType = returnType;
 
+                            //if (methodName.contains("generate")) {
+                            //    System.out.println("Parsed " + methodName);
+                            //}
                             methodMap.put(methodName + "_" + methodCount, item);
 
                             methodCount++;
                             processedNames = processedNames + method.getName() + ";";
+                        } else {
+                            //if (methodName.contains("generate")) {
+                            //    System.out.println("NOT Parsed1 " + methodName);
+                            //}
                         }
+                    } else {
+                        //if (method.getName().contains("generate")) {
+                        //    System.out.println("NOT Parsed2 " + method.getName());
+                        //}
                     }
+
                 }
             }
 
@@ -140,6 +157,9 @@ public class DocumentationGenerator {
     private static void buildIndiviualOperationReferences(ArrayList<String> names, HashMap<String, DocumentationItem> methodMap) throws IOException {
 
         for (String sortedName : names) {
+            //if (sortedName.contains("generate")) {
+            //    System.out.println("Name : " + sortedName);
+            //}
             StringBuilder builder = new StringBuilder();
             DocumentationItem item = methodMap.get(sortedName);
             builder.append("## " + item.methodName + "\n");
@@ -181,6 +201,31 @@ public class DocumentationGenerator {
                 builder.append("By " + item.author + "\n\n");
             }
             builder.append(item.description);
+
+            if (item.klass.getPackage().toString().contains(".clij2.")) {
+                //if (item.methodName.compareTo("generateTouchMatrix") == 0 ) {
+                //    System.out.println("Search for "+ item.methodName);
+                //}
+                HashMap<String, Integer> following = combinedUsageStats.getFollowing(item.methodName);
+                if (following.size() > 0) {
+                    builder.append("\n\n");
+                    builder.append("### " + item.methodName + " often followes after\n");
+                    for (String key : following.keySet()) {
+                        builder.append("* <a href=\"reference_" + key + "\">" + key + "</a> (" + following.get(key) + ")\n");
+                    }
+                }
+
+                HashMap<String, Integer> followers = combinedUsageStats.getFollowersOf(item.methodName);
+                if (followers.size() > 0) {
+                    builder.append("\n\n");
+                    builder.append("### " + item.methodName + " is often followed by\n");
+                    for (String key : followers.keySet()) {
+                        builder.append("* <a href=\"reference_" + key + "\">" + key + "</a> (" + followers.get(key) + ")\n");
+                    }
+                }
+            }
+
+
             builder.append("\n\n");
             builder.append("### Usage in ImageJ macro\n");
             builder.append("```\n");
@@ -206,8 +251,13 @@ public class DocumentationGenerator {
                 searchForExampleScripts("clijx." + item.methodName, "../clijpy/python/", "https://github.com/clij/clijpy/blob/master/python/", "python") +
                 searchForExampleScripts("clijx." + item.methodName, "../clatlab/src/main/matlab/", "https://github.com/clij/clatlab/blob/master/src/main/matlab/", "matlab");
 
+            String exampleNotebooks =
+                    searchForExampleScripts("CLIJ2_" + item.methodName, "../clij2-docs/md/", "https://github.com/clij/clij2-docs/md/", "macro");
 
 
+            if(exampleNotebooks.length() > 0) {
+                builder.append("\n\n### Example notebooks\n" + exampleNotebooks + "\n\n");
+            }
 
 
             if(linkToExamples.length() > 0) {
@@ -387,6 +437,10 @@ public class DocumentationGenerator {
             //}
             itemBuilder.append("</a>  \n");
 
+            String shortDescription = item.description.split("\n\n")[0];
+            shortDescription = shortDescription.replace("\n", " ");
+            itemBuilder.append(shortDescription + "\n");
+
             if (takeIt) {
                 builder.append(itemBuilder.toString());
             }
@@ -474,7 +528,15 @@ public class DocumentationGenerator {
             if (!file.isDirectory()) {
                 String content = readFile(file.getAbsolutePath());
                 if (content.contains(searchFor)) {
-                    result.append("<a href=\"" + baseLink + "\"><img src=\"images/language_" + language + ".png\" height=\"20\"/></a> [" + file.getName() + "](" + baseLink + file.getName() + ")  \n");
+                    result.append("<a href=\"" + baseLink + file.getName() + "\"><img src=\"images/language_" + language + ".png\" height=\"20\"/></a> [" + file.getName() + "](" + baseLink + file.getName() + ")  \n");
+                }
+            } else {
+                File readme = new File(file + "/readme.md");
+                if (readme.exists()) {
+                    String content = readFile(readme.getAbsolutePath());
+                    if (content.contains(searchFor)) {
+                        result.append("<a href=\"" + baseLink + file.getName() + "\"><img src=\"images/language_" + language + ".png\" height=\"20\"/></a> [" + file.getName() + "](" + baseLink + file.getName() + ")  \n");
+                    }
                 }
             }
         }
