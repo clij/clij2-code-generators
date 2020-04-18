@@ -79,8 +79,8 @@ public class CombinedUsageStats {
             String producer = producers.get(data);
             String consumer = consumers.get(data);
 
-            if (producer != null && consumer != null && producer.compareTo("push") != 0 && !consumer.startsWith("pull")) {
-                System.out.println("Followers: " + producer + " > " + consumer);
+            if (producer != null && consumer != null && producer.compareTo("push") != 0 && producer.compareTo("copy") != 0 && !consumer.startsWith("pull")) {
+                //System.out.println("Followers: " + producer + " > " + consumer);
                 addToMap(followers, consumer, producer);
                 addToMap(following, producer, consumer);
             }

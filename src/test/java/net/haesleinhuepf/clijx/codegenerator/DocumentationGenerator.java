@@ -163,6 +163,11 @@ public class DocumentationGenerator {
             StringBuilder builder = new StringBuilder();
             DocumentationItem item = methodMap.get(sortedName);
             builder.append("## " + item.methodName + "\n");
+
+            boolean isClij = false;
+            boolean isClij2 = false;
+            boolean isClijx = false;
+
             if (item.klass == Kernels.class) {
                 builder.append("![Image](images/mini_clij1_logo.png)");
             }
@@ -195,11 +200,18 @@ public class DocumentationGenerator {
                 }
             }
 
-
             builder.append("\n\n");
             if (item.author != null && item.author.length() > 0) {
                 builder.append("By " + item.author + "\n\n");
             }
+
+            if (isClij && (!isClij2)) {
+                builder.append("<b>This method is deprecated.</b>\n\n");
+            }
+            if ((!isClij) && (!isClij2) && isClijx) {
+                builder.append("<b>This method is experimental.</b>\n\n");
+            }
+
             builder.append(item.description);
 
             if (item.klass.getPackage().toString().contains(".clij2.")) {
@@ -209,7 +221,7 @@ public class DocumentationGenerator {
                 HashMap<String, Integer> following = combinedUsageStats.getFollowing(item.methodName);
                 if (following.size() > 0) {
                     builder.append("\n\n");
-                    builder.append("### " + item.methodName + " often followes after\n");
+                    builder.append("### " + item.methodName + " often follows after\n");
                     for (String key : following.keySet()) {
                         builder.append("* <a href=\"reference_" + key + "\">" + key + "</a> (" + following.get(key) + ")\n");
                     }
@@ -240,7 +252,7 @@ public class DocumentationGenerator {
             builder.append("\n\n");
             builder.append("### Usage in Java\n");
             builder.append("```\n");
-            builder.append(generateJavaExampleCode(item.methodName, item.parametersHeader, item.parametersCall, item.returnType));
+            builder.append(generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType));
             builder.append("```\n");
             builder.append("\n\n");
 
@@ -281,7 +293,7 @@ public class DocumentationGenerator {
         }
     }
 
-    private static String generateJavaExampleCode(String methodName, String parametersWithType, String parameters, String returnType) {
+    private static String generateJavaExampleCode(Class klass, String methodName, String parametersWithType, String parameters, String returnType) {
 
         // just some example numbers for example code
         float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
@@ -297,7 +309,7 @@ public class DocumentationGenerator {
 
         String clijObjectName;
 
-        if (isCLIJ2) {
+        if (klass.getPackage().toString().contains(".clij2.")) {
             code.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
             code.append("import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;\n");
             code.append("CLIJ2 clij2 = CLIJ2.getInstance();\n\n");
@@ -402,8 +414,13 @@ public class DocumentationGenerator {
             DocumentationItem item = methodMap.get(sortedName);
 
             StringBuilder itemBuilder = new StringBuilder();
-
+            itemBuilder.append("### ");
             boolean takeIt = false;
+
+            boolean isClij = false;
+            boolean isClij2 = false;
+            boolean isClijx = false;
+
             if (item.klass == Kernels.class) {
                 itemBuilder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/>");
                 itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
@@ -411,18 +428,21 @@ public class DocumentationGenerator {
                 takeIt = true;
             } else {
                 if (service.getCLIJMacroPlugin("CLIJ_" + item.methodName) != null) {
+                    isClij = true;
                     takeIt = true;
                     itemBuilder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/>");
                 } else {
                     itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
                 }
                 if (service.getCLIJMacroPlugin("CLIJ2_" + item.methodName) != null) {
+                    isClij2 = true;
                     takeIt = true;
                     itemBuilder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/>");
                 } else {
                     itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
                 }
                 if (service.getCLIJMacroPlugin("CLIJx_" + item.methodName) != null) {
+                    isClijx = true;
                     takeIt = true;
                     itemBuilder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/>");
                 } else {
@@ -435,11 +455,17 @@ public class DocumentationGenerator {
             //if (item.klass == Kernels.class) {
             //    builder.append("'");
             //}
+            if (isClij && (!isClij2)) {
+                itemBuilder.append(" (Deprecated)");
+            }
+            if ((!isClij) && (!isClij2) && isClijx) {
+                itemBuilder.append(" (Experimental)");
+            }
             itemBuilder.append("</a>  \n");
 
             String shortDescription = item.description.split("\n\n")[0];
             shortDescription = shortDescription.replace("\n", " ");
-            itemBuilder.append(shortDescription + "\n");
+            itemBuilder.append(shortDescription + "\n\n");
 
             if (takeIt) {
                 builder.append(itemBuilder.toString());
