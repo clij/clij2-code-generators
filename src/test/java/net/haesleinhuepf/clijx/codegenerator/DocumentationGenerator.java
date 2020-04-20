@@ -70,9 +70,9 @@ public class DocumentationGenerator {
                         String parametersHeader = "";
                         String parametersCall = "";
 
-                        //if (methodName.startsWith("generate")) {
-                        //    System.out.println("Reading " + methodName);
-                        //}
+                        if (methodName.startsWith("getMax")) {
+                            System.out.println("Reading " + methodName);
+                        }
 
                         for (Parameter parameter : method.getParameters()) {
                             if (parametersCall.length() == 0) { // first parameter
@@ -95,7 +95,7 @@ public class DocumentationGenerator {
                             }
                         }
 
-                        if (!parametersHeader.contains("ClearCLImage ") && !parametersHeader.contains("arg1")) { // we document only  buffer methods for now
+                        if (!parametersHeader.contains("ClearCLImage ")) {// && !parametersHeader.contains("arg1")) { // we document only  buffer methods for now
                             CLIJMacroPlugin plugin = findPlugin(service, methodName);
 
                             DocumentationItem item = new DocumentationItem();
@@ -121,22 +121,22 @@ public class DocumentationGenerator {
                             item.parametersCall = parametersCall;
                             item.returnType = returnType;
 
-                            //if (methodName.contains("generate")) {
-                            //    System.out.println("Parsed " + methodName);
-                            //}
+                            if (methodName.contains("getMax")) {
+                                System.out.println("Parsed " + methodName);
+                            }
                             methodMap.put(methodName + "_" + methodCount, item);
 
                             methodCount++;
                             processedNames = processedNames + method.getName() + ";";
                         } else {
-                            //if (methodName.contains("generate")) {
-                            //    System.out.println("NOT Parsed1 " + methodName);
+                            //if (methodName.contains("getMax")) {
+                            System.out.println("NOT Parsed1 " + methodName);
                             //}
                         }
                     } else {
-                        //if (method.getName().contains("generate")) {
-                        //    System.out.println("NOT Parsed2 " + method.getName());
-                        //}
+                        if (method.getName().contains("getMax")) {
+                            System.out.println("NOT Parsed2 " + method.getName());
+                        }
                     }
 
                 }
@@ -239,22 +239,28 @@ public class DocumentationGenerator {
 
 
             builder.append("\n\n");
-            builder.append("### Usage in ImageJ macro\n");
-            builder.append("```\n");
-            builder.append("Ext.CLIJ");
-            if (item.klass.getPackage().toString().contains(".clij2.")) {
-                builder.append("2");
-            } else if (item.klass != Kernels.class) {
-                builder.append("x");
+
+            if (item.parametersMacro != null) {
+                builder.append("### Usage in ImageJ macro\n");
+                builder.append("```\n");
+                builder.append("Ext.CLIJ");
+                if (item.klass.getPackage().toString().contains(".clij2.")) {
+                    builder.append("2");
+                } else if (item.klass != Kernels.class) {
+                    builder.append("x");
+                }
+                builder.append("_" + item.methodName + "(" + item.parametersMacro + ");\n");
+                builder.append("```\n");
+                builder.append("\n\n");
             }
-            builder.append("_" + item.methodName + "(" + item.parametersMacro + ");\n");
-            builder.append("```\n");
-            builder.append("\n\n");
-            builder.append("### Usage in Java\n");
-            builder.append("```\n");
-            builder.append(generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType));
-            builder.append("```\n");
-            builder.append("\n\n");
+
+            if (!item.parametersCall.contains("arg1")) {
+                builder.append("### Usage in Java\n");
+                builder.append("```\n");
+                builder.append(generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType));
+                builder.append("```\n");
+                builder.append("\n\n");
+            }
 
             String linkToExamples =
                 searchForExampleScripts("CLIJx_" + item.methodName, "../clij2-docs/src/main/macro/", "https://github.com/clij/clij2-docs/blob/master/src/main/macro/", "macro") +
@@ -264,7 +270,7 @@ public class DocumentationGenerator {
                 searchForExampleScripts("clijx." + item.methodName, "../clatlab/src/main/matlab/", "https://github.com/clij/clatlab/blob/master/src/main/matlab/", "matlab");
 
             String exampleNotebooks =
-                    searchForExampleScripts("CLIJ2_" + item.methodName, "../clij2-docs/md/", "https://github.com/clij/clij2-docs/md/", "macro");
+                    searchForExampleScripts("CLIJ2_" + item.methodName, "../clij2-docs/md/", "https://clij.github.io/clij2-docs/md/", "macro");
 
 
             if(exampleNotebooks.length() > 0) {
@@ -464,9 +470,11 @@ public class DocumentationGenerator {
             }
             itemBuilder.append("</a>  \n");
 
-            String shortDescription = item.description.split("\n\n")[0];
-            shortDescription = shortDescription.replace("\n", " ");
-            itemBuilder.append(shortDescription + "\n\n");
+            if (item.description != null) {
+                String shortDescription = item.description.split("\n\n")[0];
+                shortDescription = shortDescription.replace("\n", " ");
+                itemBuilder.append(shortDescription + "\n\n");
+            }
 
             if (takeIt) {
                 builder.append(itemBuilder.toString());
