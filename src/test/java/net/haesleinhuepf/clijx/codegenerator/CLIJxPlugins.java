@@ -395,7 +395,18 @@ public interface CLIJxPlugins {
             GetMeanOfAllPixels.class,
             GetJaccardIndex.class,
             GetCenterOfMass.class,
-            GetBoundingBox.class
+            GetBoundingBox.class,
+            PushArray.class,
+            PullString.class,
+            PushString.class,
+            MedianOfTouchingNeighbors.class,
+            PushResultsTableColumn.class,
+            PushResultsTable.class,
+            PullToResultsTable.class,
+            LabelVoronoiOctagon.class,
+            TouchMatrixToAdjacencyMatrix.class,
+            AdjacencyMatrixToTouchMatrix.class,
+            PointlistToLabelledSpots.class
     };
 
     public String blockList = ";" +
