@@ -14,5 +14,6 @@ public class RunAll {
     public static void main(String ... args) throws IOException {
         OpGenerator.main(args);
         DocumentationGenerator.main(args);
+        MakeNoteBookCodeClickable.main(args);
     }
 }
