@@ -29,14 +29,20 @@ public class MakeNoteBookCodeClickable {
                 String content = new String(Files.readAllBytes(Paths.get(notebook_folder + "/readme.md")));
                 for (String reference : documented_commands) {
                     String method = reference.replace("reference_", "CLIJ2_");
-                    String link = "[" + method + "](https://clij.github.io/clij2-docs/" + reference + ")";
+                    String mdLink = "[method](https://clij.github.io/clij2-docs/" + reference + "\")";
+                    content = content.replace("." + mdLink, "." + method);
+
+                    String link = "<a href=\"https://clij.github.io/clij2-docs/" + reference + "\">" + method + "</a>";
                     if (!content.contains(link)) {
                         content = content.replace("." + method, "." + link);
                     }
-                    Files.write(Paths.get(notebook_folder + "/readme.md"), content.getBytes());
                 }
+                content = content.replace("```java", "<pre class=\"highlight\">");
+                content = content.replace("```\n```", "");
+                content = content.replace("```", "</pre>");
+
+                Files.write(Paths.get(notebook_folder + "/readme.md"), content.getBytes());
             }
         }
-
     }
 }
