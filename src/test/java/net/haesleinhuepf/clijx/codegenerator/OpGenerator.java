@@ -69,13 +69,13 @@ public class OpGenerator {
             builder.append("   CLIJ getCLIJ();\n");
             if (isCLIJ2) {
                 builder.append("   CLIJ2 getCLIJ2();\n");
-                builder.append("   boolean doTimeTracing();\n");
-                builder.append("   void recordMethodStart(String method);\n");
-                builder.append("   void recordMethodEnd(String method);\n");
             } else {
                 builder.append("   CLIJ2 getCLIJ2();\n");
                 builder.append("   CLIJx getCLIJx();\n");
             }
+            builder.append("   boolean doTimeTracing();\n");
+            builder.append("   void recordMethodStart(String method);\n");
+            builder.append("   void recordMethodEnd(String method);\n");
             builder.append("   \n");
 
 
