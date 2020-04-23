@@ -69,6 +69,9 @@ public class OpGenerator {
             builder.append("   CLIJ getCLIJ();\n");
             if (isCLIJ2) {
                 builder.append("   CLIJ2 getCLIJ2();\n");
+                builder.append("   boolean doTimeTracing();\n");
+                builder.append("   void recordMethodStart(String method);\n");
+                builder.append("   void recordMethodEnd(String method);\n");
             } else {
                 builder.append("   CLIJ2 getCLIJ2();\n");
                 builder.append("   CLIJx getCLIJx();\n");
@@ -167,9 +170,14 @@ public class OpGenerator {
                             builder.append(parametersHeader);
                             builder.append(") {\n");
                             if (returnType.compareTo("void") == 0) {
+                                builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
                                 builder.append("        " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                                builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
                             } else {
-                                builder.append("        return " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                                builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                builder.append("        " + returnType + " result = " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                                builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                builder.append("        return result;\n");
                             }
                             builder.append("    }\n\n");
 

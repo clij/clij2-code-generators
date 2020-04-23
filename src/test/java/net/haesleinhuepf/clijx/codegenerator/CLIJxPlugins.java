@@ -406,7 +406,9 @@ public interface CLIJxPlugins {
             LabelVoronoiOctagon.class,
             TouchMatrixToAdjacencyMatrix.class,
             AdjacencyMatrixToTouchMatrix.class,
-            PointlistToLabelledSpots.class
+            PointlistToLabelledSpots.class,
+            StatisticsOfImage.class,
+            NClosestDistances.class
     };
 
     public String blockList = ";" +
