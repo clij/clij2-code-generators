@@ -13,7 +13,7 @@ import java.util.Set;
 public class DetectMissingMenuEntries {
     public static void main(String[] args) throws IOException {
 
-        String plugins_config = new String(Files.readAllBytes(Paths.get("src/main/resources/plugins.config")));
+        String plugins_config = new String(Files.readAllBytes(Paths.get("../clij2/src/main/resources/plugins.config")));
 
         CLIJMacroPluginService service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
 
