@@ -408,7 +408,8 @@ public interface CLIJxPlugins {
             AdjacencyMatrixToTouchMatrix.class,
             PointlistToLabelledSpots.class,
             StatisticsOfImage.class,
-            NClosestDistances.class
+            NClosestDistances.class,
+            ExcludeLabels.class
     };
 
     public String blockList = ";" +
