@@ -41,6 +41,8 @@ public class MakeNoteBookCodeClickable {
                 content = content.replace("```\n```", "");
                 content = content.replace("```", "</pre>");
 
+                content = content.replace("width=\"250\"", "width=\"224\"");
+
                 Files.write(Paths.get(notebook_folder + "/readme.md"), content.getBytes());
             }
         }

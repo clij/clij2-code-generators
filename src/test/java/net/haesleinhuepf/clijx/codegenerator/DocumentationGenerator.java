@@ -255,11 +255,27 @@ public class DocumentationGenerator {
             }
 
             if (!item.parametersCall.contains("arg1")) {
-                builder.append("### Usage in Java\n");
-                builder.append("```\n");
-                builder.append(generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType));
-                builder.append("```\n");
-                builder.append("\n\n");
+                String javaCode = generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
+                if (javaCode != null) {
+                    builder.append("\n\n### Usage in Java\n");
+                    builder.append(javaCode);
+                    builder.append("\n\n");
+                }
+
+                String matlabCode = generateMatlabExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
+                if (matlabCode != null) {
+                    builder.append("\n\n### Usage in Matlab\n");
+                    builder.append(matlabCode);
+                    builder.append("\n\n");
+                }
+
+
+                String icyCode = generateIcyExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
+                if (matlabCode != null) {
+                    builder.append("\n\n### Usage in Icy\n");
+                    builder.append(icyCode);
+                    builder.append("\n\n");
+                }
             }
 
             String linkToExamples =
@@ -301,6 +317,9 @@ public class DocumentationGenerator {
     }
 
     private static String generateJavaExampleCode(Class klass, String methodName, String parametersWithType, String parameters, String returnType) {
+        parameters = parameters.replace("clij, ", "");
+        parameters = parameters.replace("clij2, ", "");
+        parameters = parameters.replace("clijx, ", "");
 
         // just some example numbers for example code
         float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
@@ -312,22 +331,30 @@ public class DocumentationGenerator {
 
         StringBuilder code = new StringBuilder();
 
+        String clijObjectName = "clij2";
+
+        code.append("\n\n<details>\n\n");
+        code.append("<summary>\n");
+        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
+        code.append("</summary>\n");
+
+        code.append("<pre class=\"highlight\">");
         code.append("// init CLIJ and GPU\n");
 
-        String clijObjectName;
 
         if (klass.getPackage().toString().contains(".clij2.")) {
             code.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
             code.append("import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;\n");
             code.append("CLIJ2 clij2 = CLIJ2.getInstance();\n\n");
 
-            clijObjectName = "clij2";
+
         } else {
             code.append("import net.haesleinhuepf.clijx.CLIJx;\n");
             code.append("import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;\n");
             code.append("CLIJx clijx = CLIJx.getInstance();\n\n");
 
             clijObjectName = "clijx";
+            return null;
         }
         code.append("// get input parameters\n");
         String[] parametersArray = parametersWithType.split(",");
@@ -341,7 +368,7 @@ public class DocumentationGenerator {
                 }
                 code.append("ClearCLBuffer " + parameterName + " = " + clijObjectName + ".push(" + parameterName + "ImagePlus);\n");
             } else if (isOutputParameter(parameter)) {
-                code.append(createOutputImageCode(methodName, parameterName, inputImage));
+                code.append(createOutputImageCodeJava(methodName, parameterName, inputImage, clijObjectName));
             } else if (parameter.startsWith("Float")) {
                 code.append("float " + parameterName + " = " + floatParameterValues[floatParameterIndex]+ ";\n");
                 floatParameterIndex++;
@@ -363,13 +390,13 @@ public class DocumentationGenerator {
         }
 
 
-        code.append("```\n\n```");
+        code.append("</pre>\n\n<pre class=\"highlight\">");
         code.append("\n// Execute operation on GPU\n");
         if (returnType.toLowerCase().compareTo("boolean") != 0) {
             code.append(returnType + " result" + methodName.substring(0,1).toUpperCase() + methodName.substring(1, methodName.length()) + " = ");
         }
         code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
-        code.append("```\n\n```");
+        code.append("</pre>\n\n<pre class=\"highlight\">");
 
         code.append("\n//show result\n");
         if (returnType.toLowerCase().compareTo("boolean") != 0) {
@@ -393,7 +420,209 @@ public class DocumentationGenerator {
                 code.append(clijObjectName + ".release(" + parameterName + ");\n");
             }
         }
+        code.append("</pre>");
 
+        code.append("\n\n</details>\n\n");
+        return code.toString();
+    }
+
+
+    private static String generateIcyExampleCode(Class klass, String methodName, String parametersWithType, String parameters, String returnType) {
+        parameters = parameters.replace("clij, ", "");
+        parameters = parameters.replace("clij2, ", "");
+        parameters = parameters.replace("clijx, ", "");
+
+        // just some example numbers for example code
+        float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
+        int[] integerParameterValues = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170};
+        boolean[] booleanParameterValues = {true, false, false, true};
+        int floatParameterIndex = 0;
+        int integerParameterIndex = 0;
+        int booleanParameterIndex = 0;
+
+        StringBuilder code = new StringBuilder();
+        String clijObjectName = "clij2";;
+
+
+        code.append("\n\n<details>\n\n");
+        code.append("<summary>\n");
+        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
+        code.append("</summary>\n");
+        code.append("<pre class=\"highlight\">");
+
+        code.append("// init CLIJ and GPU\n");
+
+
+        if (klass.getPackage().toString().contains(".clij2.")) {
+            code.append("importClass(net.haesleinhuepf.clicy.CLICY);\n" +
+                    "importClass(Packages.icy.main.Icy);\n\n" +
+                    "clij2 = CLICY.getInstance();\n\n");
+
+        } else {
+            return null;
+        }
+        code.append("// get input parameters\n");
+        String[] parametersArray = parametersWithType.split(",");
+        String inputImage = "";
+        for (String parameter : parametersArray) {
+            parameter = parameter.trim();
+            String parameterName = parameter.split(" ")[1];
+            if (isInputParameter(parameter)) {
+                if (inputImage.length() == 0) {
+                    inputImage = parameterName;
+                }
+                code.append(parameterName + "_sequence = getSequence();");
+                code.append(parameterName + " = " + clijObjectName + ".pushSequence(" + parameterName + "_sequence);\n");
+            } else if (isOutputParameter(parameter)) {
+                code.append(createOutputImageCodeMatlabIcy(methodName, parameterName, inputImage, clijObjectName));
+            } else if (parameter.startsWith("Float")) {
+                code.append(parameterName + " = " + floatParameterValues[floatParameterIndex]+ ";\n");
+                floatParameterIndex++;
+            } else if (parameter.startsWith("Integer")) {
+                code.append(parameterName + " = " + integerParameterValues[integerParameterIndex] + ";\n");
+                integerParameterIndex++;
+            } else if (parameter.startsWith("Boolean")) {
+                code.append(parameterName + " = " + booleanParameterValues[booleanParameterIndex] + ";\n");
+                booleanParameterIndex++;
+            } else if (parameter.startsWith("AffineTransform3D")) {
+                return null;
+            } else if (parameter.startsWith("AffineTransform2D")) {
+                return null;
+            }
+        }
+
+
+        code.append("</pre>\n\n<pre class=\"highlight\">");
+        code.append("\n// Execute operation on GPU\n");
+        if (returnType.toLowerCase().compareTo("boolean") != 0) {
+            code.append(returnType + " result" + methodName.substring(0,1).toUpperCase() + methodName.substring(1, methodName.length()) + " = ");
+        }
+        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
+        code.append("</pre>\n\n<pre class=\"highlight\">");
+
+        code.append("\n// show result\n");
+        if (returnType.toLowerCase().compareTo("boolean") != 0) {
+            code.append("System.out.println(result" + methodName.substring(0,1).toUpperCase() + methodName.substring(1, methodName.length()) + ");\n");
+        }
+
+        for (String parameter : parametersArray) {
+            parameter = parameter.trim();
+            String parameterName = parameter.split(" ")[1];
+            if (isOutputParameter(parameter)) {
+                code.append(parameterName + "_sequence = " + clijObjectName + ".pullSequence(" + parameterName + ")\n");
+                code.append("Icy.addSequence("  + parameterName + "_sequence");
+            }
+        }
+
+        code.append("\n// cleanup memory on GPU\n");
+        for (String parameter : parametersArray) {
+            parameter = parameter.trim();
+            String parameterName = parameter.split(" ")[1];
+            if (isInputParameter(parameter) || isOutputParameter(parameter)) {
+                code.append(clijObjectName + ".release(" + parameterName + ");\n");
+            }
+        }
+        code.append("</pre>");
+
+        code.append("\n\n</details>\n\n");
+
+        return code.toString();
+    }
+
+
+    private static String generateMatlabExampleCode(Class klass, String methodName, String parametersWithType, String parameters, String returnType) {
+        parameters = parameters.replace("clij, ", "");
+        parameters = parameters.replace("clij2, ", "");
+        parameters = parameters.replace("clijx, ", "");
+
+        // just some example numbers for example code
+        float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
+        int[] integerParameterValues = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170};
+        boolean[] booleanParameterValues = {true, false, false, true};
+        int floatParameterIndex = 0;
+        int integerParameterIndex = 0;
+        int booleanParameterIndex = 0;
+
+        StringBuilder code = new StringBuilder();
+        String clijObjectName = "clij2";
+
+        code.append("\n\n<details>\n\n");
+        code.append("<summary>\n");
+        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
+        code.append("</summary>\n");
+
+        code.append("<pre class=\"highlight\">");
+        code.append("% init CLIJ and GPU\n");
+
+        if (klass.getPackage().toString().contains(".clij2.")) {
+            code.append("clij2 = init_clatlab();\n\n");
+
+        } else {
+            return null;
+        }
+        code.append("% get input parameters\n");
+        String[] parametersArray = parametersWithType.split(",");
+        String inputImage = "";
+        for (String parameter : parametersArray) {
+            parameter = parameter.trim();
+            String parameterName = parameter.split(" ")[1];
+            if (isInputParameter(parameter)) {
+                if (inputImage.length() == 0) {
+                    inputImage = parameterName;
+                }
+                code.append(parameterName + " = " + clijObjectName + ".pushMat(" + parameterName + "_matrix);\n");
+            } else if (isOutputParameter(parameter)) {
+                code.append(createOutputImageCodeMatlabIcy(methodName, parameterName, inputImage, clijObjectName));
+            } else if (parameter.startsWith("Float")) {
+                code.append(parameterName + " = " + floatParameterValues[floatParameterIndex]+ ";\n");
+                floatParameterIndex++;
+            } else if (parameter.startsWith("Integer")) {
+                code.append(parameterName + " = " + integerParameterValues[integerParameterIndex] + ";\n");
+                integerParameterIndex++;
+            } else if (parameter.startsWith("Boolean")) {
+                code.append(parameterName + " = " + booleanParameterValues[booleanParameterIndex] + ";\n");
+                booleanParameterIndex++;
+            } else if (parameter.startsWith("AffineTransform3D")) {
+                return null;
+            } else if (parameter.startsWith("AffineTransform2D")) {
+                return null;
+            }
+        }
+
+
+        code.append("</pre>\n\n<pre class=\"highlight\">");
+        code.append("\n% Execute operation on GPU\n");
+        if (returnType.toLowerCase().compareTo("boolean") != 0) {
+            code.append(returnType + " result" + methodName.substring(0,1).toUpperCase() + methodName.substring(1, methodName.length()) + " = ");
+        }
+        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
+        code.append("</pre>\n\n<pre class=\"highlight\">");
+
+        code.append("\n% show result\n");
+        if (returnType.toLowerCase().compareTo("boolean") != 0) {
+            code.append("System.out.println(result" + methodName.substring(0,1).toUpperCase() + methodName.substring(1, methodName.length()) + ");\n");
+        }
+
+        for (String parameter : parametersArray) {
+            parameter = parameter.trim();
+            String parameterName = parameter.split(" ")[1];
+            if (isOutputParameter(parameter)) {
+                code.append(parameterName + " = " + clijObjectName + ".pullMat(" + parameterName + ")\n");
+            }
+        }
+
+        code.append("\n% cleanup memory on GPU\n");
+        for (String parameter : parametersArray) {
+            parameter = parameter.trim();
+            String parameterName = parameter.split(" ")[1];
+            if (isInputParameter(parameter) || isOutputParameter(parameter)) {
+                code.append(clijObjectName + ".release(" + parameterName + ");\n");
+            }
+        }
+
+        code.append("</pre>");
+
+        code.append("\n\n</details>\n\n");
         return code.toString();
     }
 
@@ -617,24 +846,47 @@ public class DocumentationGenerator {
     }
 
 
-    protected static String createOutputImageCode(String methodName, String parameterName, String inputImage) {
+    protected static String createOutputImageCodeJava(String methodName, String parameterName, String inputImage, String clijObjectName) {
         if (methodName.compareTo("resliceTop") == 0 ||
                 methodName.compareTo("resliceBottom") == 0 ) {
-            return parameterName + " = clij.create(new long[]{" + inputImage + ".getWidth(), " + inputImage + ".getDepth(), " + inputImage + ".getHeight()}, " + inputImage + ".getNativeType());\n";
+            return parameterName + " = " + clijObjectName + ".create(new long[]{" + inputImage + ".getWidth(), " + inputImage + ".getDepth(), " + inputImage + ".getHeight()}, " + inputImage + ".getNativeType());\n";
         } else if (methodName.compareTo("resliceLeft") == 0 ||
                 methodName.compareTo("resliceRight") == 0 ) {
-            return parameterName + " = clij.create(new long[]{" + inputImage + ".getHeight(), " + inputImage + ".getDepth(), " + inputImage + ".getWidth()}, " + inputImage + ".getNativeType());\n";
+            return parameterName + " = " + clijObjectName + ".create(new long[]{" + inputImage + ".getHeight(), " + inputImage + ".getDepth(), " + inputImage + ".getWidth()}, " + inputImage + ".getNativeType());\n";
         } else if (methodName.compareTo("maximumZProjection") == 0 ||
                 methodName.compareTo("maximumXYZProjection") == 0  ||
                 methodName.compareTo("meanZProjection") == 0  ||
                 methodName.compareTo("copySlice") == 0  ||
                 methodName.compareTo("minimumZProjection") == 0 ) {
-            return parameterName + " = clij.create(new long[]{" + inputImage + ".getWidth(), " + inputImage + ".getHeight()}, " + inputImage + ".getNativeType());\n";
+            return parameterName + " = " + clijObjectName + ".create(new long[]{" + inputImage + ".getWidth(), " + inputImage + ".getHeight()}, " + inputImage + ".getNativeType());\n";
         } else if (methodName.compareTo("convertToImageJBinary") == 0) {
             return "from net.haesleinhuepf.clij.coremem.enums import NativeTypeEnum;\n" +
                     "ClearCLBuffer " + parameterName + " = clij.create(" + inputImage + ".getDimensions(), " + inputImage + ".getHeight()], NativeTypeEnum.UnsignedByte);\n";
         } else {
-            return parameterName + " = clij.create(" + inputImage + ");\n";
+            return parameterName + " = " + clijObjectName + ".create(" + inputImage + ");\n";
         }
     }
+
+
+    protected static String createOutputImageCodeMatlabIcy(String methodName, String parameterName, String inputImage, String clijObjectName) {
+        if (methodName.compareTo("resliceTop") == 0 ||
+                methodName.compareTo("resliceBottom") == 0 ) {
+            return parameterName + " = " + clijObjectName + ".create([" + inputImage + ".getWidth(), " + inputImage + ".getDepth(), " + inputImage + ".getHeight()], " + inputImage + ".getNativeType());\n";
+        } else if (methodName.compareTo("resliceLeft") == 0 ||
+                methodName.compareTo("resliceRight") == 0 ) {
+            return parameterName + " = " + clijObjectName + ".create([" + inputImage + ".getHeight(), " + inputImage + ".getDepth(), " + inputImage + ".getWidth()], " + inputImage + ".getNativeType());\n";
+        } else if (methodName.compareTo("maximumZProjection") == 0 ||
+                methodName.compareTo("maximumXYZProjection") == 0  ||
+                methodName.compareTo("meanZProjection") == 0  ||
+                methodName.compareTo("copySlice") == 0  ||
+                methodName.compareTo("minimumZProjection") == 0 ) {
+            return parameterName + " = " + clijObjectName + ".create([" + inputImage + ".getWidth(), " + inputImage + ".getHeight()], " + inputImage + ".getNativeType());\n";
+        } else if (methodName.compareTo("convertToImageJBinary") == 0) {
+            return "from net.haesleinhuepf.clij.coremem.enums import NativeTypeEnum;\n" +
+                    "ClearCLBuffer " + parameterName + " = clij.create(" + inputImage + ".getDimensions(), " + inputImage + ".getHeight()], NativeTypeEnum.UnsignedByte);\n";
+        } else {
+            return parameterName + " = " + clijObjectName + ".create(" + inputImage + ");\n";
+        }
+    }
+
 }
