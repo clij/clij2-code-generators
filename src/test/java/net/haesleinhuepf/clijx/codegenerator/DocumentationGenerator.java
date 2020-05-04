@@ -471,7 +471,7 @@ public class DocumentationGenerator {
                 if (inputImage.length() == 0) {
                     inputImage = parameterName;
                 }
-                code.append(parameterName + "_sequence = getSequence();");
+                code.append(parameterName + "_sequence = getSequence();\n");
                 code.append(parameterName + " = " + clijObjectName + ".pushSequence(" + parameterName + "_sequence);\n");
             } else if (isOutputParameter(parameter)) {
                 code.append(createOutputImageCodeMatlabIcy(methodName, parameterName, inputImage, clijObjectName));
@@ -510,7 +510,7 @@ public class DocumentationGenerator {
             String parameterName = parameter.split(" ")[1];
             if (isOutputParameter(parameter)) {
                 code.append(parameterName + "_sequence = " + clijObjectName + ".pullSequence(" + parameterName + ")\n");
-                code.append("Icy.addSequence("  + parameterName + "_sequence");
+                code.append("Icy.addSequence("  + parameterName + "_sequence);");
             }
         }
 
