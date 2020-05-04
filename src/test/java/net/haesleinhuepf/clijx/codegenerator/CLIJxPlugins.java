@@ -409,7 +409,10 @@ public interface CLIJxPlugins {
             PointlistToLabelledSpots.class,
             StatisticsOfImage.class,
             NClosestDistances.class,
-            ExcludeLabels.class
+            ExcludeLabels.class,
+            AverageDistanceOfNFarOffPoints.class,
+            StandardDeviationOfTouchingNeighbors.class,
+            NeighborsOfNeighbors.class
     };
 
     public String blockList = ";" +
