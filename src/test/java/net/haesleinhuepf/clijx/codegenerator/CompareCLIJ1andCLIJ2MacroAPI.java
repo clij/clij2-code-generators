@@ -39,7 +39,7 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
                     boolean methodFound = false;
                     for (String clij2macroMethodName : allMethods) {
                         if (clij2macroMethodName.startsWith("CLIJ2_")) {
-                            if (clij1macroMethodName.compareTo(clij2macroMethodName.replace("CLIJ2_", "CLIJ_")) == 0) {
+                            if (clij1macroMethodName.compareTo(clij2macroMethodName.replace("ByRef ", "").replace("CLIJ2_", "CLIJ_")) == 0) {
                                 methodFound = true;
                                 break;
                             }
@@ -63,7 +63,7 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
                     boolean methodFound = false;
                     for (String clij1macroMethodName : allMethods) {
                         if (clij1macroMethodName.startsWith("CLIJ_")) {
-                            if (clij1macroMethodName.compareTo(clij2macroMethodName.replace("CLIJ2_", "CLIJ_")) == 0) {
+                            if (clij1macroMethodName.compareTo(clij2macroMethodName.replace("ByRef ", "").replace("CLIJ2_", "CLIJ_")) == 0) {
                                 methodFound = true;
                                 break;
                             }
