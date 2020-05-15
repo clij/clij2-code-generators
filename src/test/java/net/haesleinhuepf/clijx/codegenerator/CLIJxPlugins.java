@@ -412,7 +412,8 @@ public interface CLIJxPlugins {
             ExcludeLabels.class,
             AverageDistanceOfNFarOffPoints.class,
             StandardDeviationOfTouchingNeighbors.class,
-            NeighborsOfNeighbors.class
+            NeighborsOfNeighbors.class,
+            GenerateParametricImage.class
     };
 
     public String blockList = ";" +
