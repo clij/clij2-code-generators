@@ -169,6 +169,11 @@ public class OpGenerator {
                             builder.append("    default " + returnType + " " + methodName + "(");
                             builder.append(parametersHeader);
                             builder.append(") {\n");
+
+                            if (deprecated) {
+                                builder.append("        System.out.println(\"" + methodName +  " is deprecated. Check the documentation for a replacement. https://clij.github.io/clij2-doccs/reference\");\n");
+                            }
+
                             if (returnType.compareTo("void") == 0) {
                                 builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
                                 builder.append("        " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
