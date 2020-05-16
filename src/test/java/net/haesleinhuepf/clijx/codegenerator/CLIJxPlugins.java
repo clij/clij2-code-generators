@@ -413,7 +413,20 @@ public interface CLIJxPlugins {
             AverageDistanceOfNFarOffPoints.class,
             StandardDeviationOfTouchingNeighbors.class,
             NeighborsOfNeighbors.class,
-            GenerateParametricImage.class
+            GenerateParametricImage.class,
+            GenerateParametricImageFromResultsTableColumn.class,
+            ExcludeLabelsWithValuesOutOfRange.class,
+            ExcludeLabelsWithValuesWithinRange.class,
+            CombineVertically.class,
+            CombineHorizontally.class,
+            ReduceStack.class,
+            DetectMinima2DBox.class,
+            DetectMaxima2DBox.class,
+            DetectMinima3DBox.class,
+            DetectMaxima3DBox.class,
+            DepthColorProjection.class,
+            GenerateBinaryOverlapMatrix.class,
+            ResliceRadialTop.class
     };
 
     public String blockList = ";" +
