@@ -47,7 +47,7 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
                     }
                     if (!methodFound) {
                         System.out.println("clij1 method not found in clij2 api: " + clij1macroMethodName);
-                        methodListing.append("* " + clij1macroMethodName + "\n");
+                        methodListing.append("* [" + clij1macroMethodName + "](https://clij.github.io/clij-docs/reference#" + clij1macroMethodName.split("\\(")[0] + ")\n");
                         count++;
                     }
                 }
@@ -71,7 +71,7 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
                     }
                     if (!methodFound) {
                         System.out.println("clij2 method not found in clij1 api: " + clij2macroMethodName);
-                        methodListing.append("* " + clij2macroMethodName + "\n");
+                        methodListing.append("* [" + clij2macroMethodName + "](https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.split("\\(")[0].replace("CLIJ2_", "") + ")\n");
                         count++;
                     }
                 }
@@ -95,7 +95,9 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
                     }
                     if (!methodFound) {
                         System.out.println("clijx method not found in clij2 api: " + clijxmacroMethodName);
-                        methodListing.append("* " + clijxmacroMethodName + "\n");
+                        methodListing.append("* [" + clijxmacroMethodName + "](https://clij.github.io/clij2-docs/reference_" + clijxmacroMethodName.split("\\(")[0].replace("CLIJ2_", "") + ")\n");
+
+                        //methodListing.append("* " + clijxmacroMethodName + "\n");
                         count++;
                     }
                 }
