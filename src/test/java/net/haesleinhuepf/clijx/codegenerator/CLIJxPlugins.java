@@ -426,7 +426,10 @@ public interface CLIJxPlugins {
             DetectMaxima3DBox.class,
             DepthColorProjection.class,
             GenerateBinaryOverlapMatrix.class,
-            ResliceRadialTop.class
+            ResliceRadialTop.class,
+            Convolve.class,
+            NonLocalMeans.class,
+            Bilateral.class
     };
 
     public String blockList = ";" +
