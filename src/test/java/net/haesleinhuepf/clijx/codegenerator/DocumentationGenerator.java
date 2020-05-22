@@ -62,8 +62,8 @@ public class DocumentationGenerator {
                             (method.getParameters()[0].getType() == CLIJ.class ||
                             method.getParameters()[0].getType() == CLIJ2.class||
                             method.getParameters()[0].getType() == CLIJx.class) &&
-                            OpGenerator.blockListOk(klass, method) &&
-                            !processedNames.contains(";" + method.getName() + ";")
+                            OpGenerator.blockListOk(klass, method) //&&
+                            //((!processedNames.contains(";" + method.getName()  + ";")) || (methodMap.get(method.getName()) != null && methodMap.get(method.getName()).description == null))
                     ) {
                         String methodName = method.getName();
                         String returnType = typeToString(method.getReturnType());
@@ -121,10 +121,27 @@ public class DocumentationGenerator {
                             item.parametersCall = parametersCall;
                             item.returnType = returnType;
 
-                            if (methodName.contains("getMax")) {
+                            if (methodName.contains("histogram")) {
                                 System.out.println("Parsed " + methodName);
                             }
-                            methodMap.put(methodName + "_" + methodCount, item);
+
+                            if (methodName.compareTo("histogram") == 0) {
+                                System.out.println("HISTOGRAM");
+                                System.out.println(item.description);
+                                System.out.println(item.klass);
+                                System.out.println(((OffersDocumentation) plugin).getDescription());
+                                net.haesleinhuepf.clij2.plugins.Histogram h;
+                            }
+
+                            if (methodMap.containsKey(methodName)) {
+                                if (!item.parametersCall.contains("arg1")) {
+
+                                    methodMap.remove(methodName);
+                                    methodMap.put(methodName, item);
+                                }
+                            } else {
+                                methodMap.put(methodName, item);
+                            }
 
                             methodCount++;
                             processedNames = processedNames + method.getName() + ";";
