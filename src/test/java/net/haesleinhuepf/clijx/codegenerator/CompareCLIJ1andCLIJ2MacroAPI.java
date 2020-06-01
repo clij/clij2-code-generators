@@ -114,7 +114,7 @@ public class CompareCLIJ1andCLIJ2MacroAPI {
         }
     }
 
-    private static String[] getMethods(CLIJMacroPluginService service){
+    static String[] getMethods(CLIJMacroPluginService service){
         Set<String> methods = service.getCLIJMethodNames();
         String[] methodsWithParameters = new String[methods.size()];
         int count = 0;
