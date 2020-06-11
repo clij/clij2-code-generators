@@ -297,16 +297,6 @@ public class OpGenerator {
 
     static CLIJMacroPlugin findPlugin(CLIJMacroPluginService service, String methodName) {
         String[] potentialMethodNames = {
-                "CLIJ_" + methodName,
-                "CLIJ_" + methodName + "2D",
-                "CLIJ_" + methodName + "3D",
-                "CLIJ_" + methodName + "Images",
-                "CLIJ_" + methodName.replace( "Sphere", "2DSphere"),
-                "CLIJ_" + methodName.replace( "Sphere", "3DSphere"),
-                "CLIJ_" + methodName.replace( "Box", "2DBox"),
-                "CLIJ_" + methodName.replace( "Box", "3DBox"),
-                "CLIJ_" + methodName.replace( "Pixels", "OfAllPixels"),
-                "CLIJ_" + methodName.replace( "SliceBySlice", "3DSliceBySlice"),
                 "CLIJ2_" + methodName,
                 "CLIJ2_" + methodName + "2D",
                 "CLIJ2_" + methodName + "3D",
