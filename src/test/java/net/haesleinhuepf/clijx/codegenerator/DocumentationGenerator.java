@@ -43,7 +43,7 @@ public class DocumentationGenerator {
     private static CombinedUsageStats combinedUsageStats;
 
     public static void main(String ... args) throws IOException {
-        combinedUsageStats = new CombinedUsageStats("../clij2-docs/src/main/macro/");
+        combinedUsageStats = new CombinedUsageStats("../clij2-docs/src/main/macro/", "../scripts_hidden/", "../scripts/");
         service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
         boolean[] booleans = new boolean[]{false, true};
 
@@ -266,7 +266,7 @@ public class DocumentationGenerator {
                 } else if (item.klass != Kernels.class) {
                     builder.append("x");
                 }
-                builder.append("_" + item.methodName + "(" + item.parametersMacro + ");\n");
+                builder.append("_" + item.methodName + "(" + item.parametersMacro.replace("ByRef ", "") + ");\n");
                 builder.append("```\n");
                 builder.append("\n\n");
             }
@@ -296,11 +296,14 @@ public class DocumentationGenerator {
             }
 
             String linkToExamples =
-                searchForExampleScripts("CLIJx_" + item.methodName, "../clij2-docs/src/main/macro/", "https://github.com/clij/clij2-docs/blob/master/src/main/macro/", "macro") +
                 searchForExampleScripts("CLIJ2_" + item.methodName, "../clij2-docs/src/main/macro/", "https://github.com/clij/clij2-docs/blob/master/src/main/macro/", "macro") +
-                searchForExampleScripts("clijx." + item.methodName, "../clij2-docs/src/main/jython/", "https://github.com/clij/clij2-docs/blob/master/src/main/jython/", "jython") +
-                searchForExampleScripts("clijx." + item.methodName, "../clijpy/python/", "https://github.com/clij/clijpy/blob/master/python/", "python") +
-                searchForExampleScripts("clijx." + item.methodName, "../clatlab/src/main/matlab/", "https://github.com/clij/clatlab/blob/master/src/main/matlab/", "matlab");
+                searchForExampleScripts("clij2." + item.methodName, "../clatlab/src/main/matlab/", "https://github.com/clij/clatlab/blob/master/src/main/matlab/", "matlab") +
+                searchForExampleScripts("clij2." + item.methodName, "../clicy/src/main/javascript/", "https://github.com/clij/clicy/blob/master/src/main/javascript/", "javascript") +
+                searchForExampleScripts("clij2." + item.methodName, "../clij2-docs/src/main/javascript/", "https://github.com/clij/clij2-docs/blob/master/src/main/javascript/", "javascript") +
+                searchForExampleScripts("clij2." + item.methodName, "../clij2-docs/src/main/groovy/", "https://github.com/clij/clij2-docs/blob/master/src/main/groovy/", "groovy") +
+                searchForExampleScripts("clij2." + item.methodName, "../clij2-docs/src/main/beanshell/", "https://github.com/clij/clij2-docs/blob/master/src/main/beanshell/", "beanshell") +
+                searchForExampleScripts("clij2." + item.methodName, "../clij2-docs/src/main/jython/", "https://github.com/clij/clij2-docs/blob/master/src/main/jython/", "jython") +
+                        "";
 
             String exampleNotebooks =
                     searchForExampleScripts("CLIJ2_" + item.methodName, "../clij2-docs/md/", "https://clij.github.io/clij2-docs/md/", "macro");
@@ -646,12 +649,12 @@ public class DocumentationGenerator {
     private static void buildReference(ArrayList<String> names, HashMap<String, DocumentationItem> methodMap) throws IOException {
         StringBuilder builder = new StringBuilder();
         builder.append("# CLIJ 1/2/x reference\n");
-        builder.append("This reference contains all methods currently available in CLIJ2 and CLIJx. Read more about [CLIJs release cycle](https://clij.github.io/clij-docs/release_cycle) \n\n");
-        builder.append("__Please note:__ CLIJ2 and CLIJx are under heavy construction. This list may change at any point.");
+        builder.append("This reference contains all methods currently available in CLIJ, CLIJ2 and CLIJx. Read more about [CLIJs release cycle](https://clij.github.io/clij-docs/release_cycle) \n\n");
+        builder.append("__Please note:__ CLIJ is deprecated. [Make the transition to CLIJ2](https://clij.github.io/clij2-docs/clij2_transition_notes).");
         builder.append("\n\n");
-        builder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ (stable release)  \n");
-        builder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ2 (alpha release, [read more](https://forum.image.sc/t/clij2-alpha-release/33821))  \n");
-        builder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJx (experimental version)  \n");
+        builder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ (deprecated release)  \n");
+        builder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ2 (stable release)  \n");
+        builder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJx (experimental release)  \n");
         builder.append("\n\n##ALPHABET##\n\n");
 
         String firstChar = " ";

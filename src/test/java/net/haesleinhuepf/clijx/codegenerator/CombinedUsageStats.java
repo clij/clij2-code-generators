@@ -18,17 +18,21 @@ public class CombinedUsageStats {
     HashMap<String, Integer> followers = new HashMap<>();
     HashMap<String, Integer> following = new HashMap<>();
 
-    public CombinedUsageStats(String macroPath) {
-        File folder = new File(macroPath);
+    public CombinedUsageStats(String... macroPaths) {
+        for (String macroPath : macroPaths) {
+            File folder = new File(macroPath);
+            if (folder.exists()) {
 
-        for (File file : folder.listFiles()) {
-            if (file.getName().endsWith(".ijm")) {
-                try {
-                    parseFile(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                for (File file : folder.listFiles()) {
+                    if (file.getName().endsWith(".ijm")) {
+                        try {
+                            parseFile(file);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        //break;
+                    }
                 }
-                //break;
             }
         }
     }
