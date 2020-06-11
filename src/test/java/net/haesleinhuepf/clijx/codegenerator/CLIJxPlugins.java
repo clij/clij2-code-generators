@@ -429,7 +429,17 @@ public interface CLIJxPlugins {
             ResliceRadialTop.class,
             Convolve.class,
             NonLocalMeans.class,
-            Bilateral.class
+            Bilateral.class,
+            UndefinedToZero.class,
+            GenerateJaccardIndexMatrix.class,
+            GenerateTouchCountMatrix.class,
+            MinimumXProjection.class,
+            MinimumYProjection.class,
+            MeanXProjection.class,
+            MeanYProjection.class,
+            SquaredDifference.class,
+            AbsoluteDifference.class,
+            ReplacePixelsIfZero.class
     };
 
     public String blockList = ";" +
