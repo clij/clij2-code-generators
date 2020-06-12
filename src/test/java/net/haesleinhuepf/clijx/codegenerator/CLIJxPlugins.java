@@ -319,7 +319,6 @@ public interface CLIJxPlugins {
             CloseIndexGapsInLabelMap.class,
             AffineTransform.class,
             Scale.class,
-            AverageAngleBetweenAdjacentTriangles.class,
             CentroidsOfLabels.class,
             SetRampX.class,
             SetRampY.class,
