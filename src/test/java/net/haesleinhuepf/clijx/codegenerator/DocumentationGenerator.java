@@ -6,6 +6,8 @@ import net.haesleinhuepf.clij.macro.CLIJMacroPlugin;
 import net.haesleinhuepf.clij.macro.CLIJMacroPluginService;
 import net.haesleinhuepf.clij.macro.documentation.OffersDocumentation;
 import net.haesleinhuepf.clij2.CLIJ2;
+import net.haesleinhuepf.clij2.plugins.Mean2DBox;
+import net.haesleinhuepf.clij2.utilities.IsCategorized;
 import net.haesleinhuepf.clijx.CLIJx;
 import net.haesleinhuepf.clij2.utilities.HasAuthor;
 import net.haesleinhuepf.clij2.utilities.HasLicense;
@@ -36,6 +38,7 @@ public class DocumentationGenerator {
         String description;
         String author;
         String license;
+        String categories;
     }
 
     private static boolean isCLIJ2;
@@ -112,6 +115,9 @@ public class DocumentationGenerator {
                                 if (plugin instanceof HasLicense) {
                                     item.license = ((HasLicense) plugin).getLicense();
                                 }
+                                if (plugin instanceof IsCategorized) {
+                                    item.categories = ((IsCategorized) plugin).getCategories();
+                                }
                             }
 
                             item.klass = klass;
@@ -121,17 +127,9 @@ public class DocumentationGenerator {
                             item.parametersCall = parametersCall;
                             item.returnType = returnType;
 
-                            if (methodName.contains("histogram")) {
-                                System.out.println("Parsed " + methodName);
-                            }
-
-                            if (methodName.compareTo("histogram") == 0) {
-                                System.out.println("HISTOGRAM");
-                                System.out.println(item.description);
-                                System.out.println(item.klass);
-                                System.out.println(((OffersDocumentation) plugin).getDescription());
-                                net.haesleinhuepf.clij2.plugins.Histogram h;
-                            }
+                            //if (methodName.contains("histogram")) {
+                            //    System.out.println("Parsed " + methodName);
+                            //}
 
                             if (methodMap.containsKey(methodName)) {
                                 if (!item.parametersCall.contains("arg1")) {
@@ -166,7 +164,16 @@ public class DocumentationGenerator {
 
             // auto-completion list
             buildAutoCompletion(names, methodMap);
-            buildReference(names, methodMap);
+            buildReference(names, methodMap, "", "");
+            buildReference(names, methodMap, "binary", " for processing binary images.");
+            buildReference(names, methodMap, "filter", " for filtering images.");
+            buildReference(names, methodMap, "matrix", " for working with matrices.");
+            buildReference(names, methodMap, "label", " for processing labelled images.");
+            buildReference(names, methodMap, "neighbor", " for processing neighboring objects.");
+            buildReference(names, methodMap, "transform", " for transforming images in space.");
+            buildReference(names, methodMap, "math", " for performing general mathematical operations on images.");
+            buildReference(names, methodMap, "measurement", " for performing measurements in images.");
+            buildReference(names, methodMap, "project", " for projecting images.");
             buildIndiviualOperationReferences(names, methodMap);
         }
     }
@@ -646,93 +653,121 @@ public class DocumentationGenerator {
         return code.toString();
     }
 
-    private static void buildReference(ArrayList<String> names, HashMap<String, DocumentationItem> methodMap) throws IOException {
+    private static void buildReference(ArrayList<String> names, HashMap<String, DocumentationItem> methodMap, String search_string, String search_description) throws IOException {
         StringBuilder builder = new StringBuilder();
-        builder.append("# CLIJ 1/2/x reference\n");
-        builder.append("This reference contains all methods currently available in CLIJ, CLIJ2 and CLIJx. Read more about [CLIJs release cycle](https://clij.github.io/clij-docs/release_cycle) \n\n");
+
+        String additional_header = "";
+
+        if (search_string.length() > 0) {
+            additional_header = " in category '" + search_string + "'";
+        }
+
+        builder.append("# CLIJ 1/2/x reference" + additional_header + "\n");
+        builder.append("This reference contains all methods currently available in CLIJ, CLIJ2 and CLIJx" + search_description + ". Read more about [CLIJs release cycle](https://clij.github.io/clij-docs/release_cycle) \n\n");
         builder.append("__Please note:__ CLIJ is deprecated. [Make the transition to CLIJ2](https://clij.github.io/clij2-docs/clij2_transition_notes).");
         builder.append("\n\n");
         builder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ (deprecated release)  \n");
         builder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ2 (stable release)  \n");
         builder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJx (experimental release)  \n");
+
+        builder.append("\n\n\n__Categories:__ ");
+        builder.append("[Binary](https://clij.github.io/clij2-docs/reference__binary)");
+        builder.append(", [Filter](https://clij.github.io/clij2-docs/reference__filter)");
+        builder.append(", [Labels](https://clij.github.io/clij2-docs/reference__label)");
+        builder.append(", [Math](https://clij.github.io/clij2-docs/reference__math)");
+        builder.append(", [Matrices](https://clij.github.io/clij2-docs/reference__matrix)");
+        builder.append(", [Measurements](https://clij.github.io/clij2-docs/reference__measurement)");
+        builder.append(", [Neighbors](https://clij.github.io/clij2-docs/reference__neighbor)");
+        builder.append(", [Projections](https://clij.github.io/clij2-docs/reference__project)");
+        builder.append(", [Transformations](https://clij.github.io/clij2-docs/reference__transform)");
+
         builder.append("\n\n##ALPHABET##\n\n");
 
         String firstChar = " ";
         String listOfChars = " A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z";
         for (String sortedName : names) {
-            if (sortedName.substring(0,1).toUpperCase().compareTo(firstChar.trim()) != 0) {
-                firstChar = sortedName.substring(0,1).toUpperCase();
-                builder.append("<a name=\"" + firstChar + "\"></a>\n");
-                builder.append("\n## " + firstChar + "\n");
-
-                listOfChars = listOfChars.replace(" " + firstChar, "<a href=\"#" + firstChar + "\">\\[" + firstChar + "\\]</a>");
-            }
             DocumentationItem item = methodMap.get(sortedName);
+            //System.out.println(item.klass + " >>> " + item.categories);
+            if (search_string.length() == 0 ||
+                    (item.description != null && (item.description.toLowerCase().contains(search_string.toLowerCase()))) ||
+                    (item.categories != null && item.categories.toLowerCase().contains(search_string.toLowerCase())) ||
+                    sortedName.toLowerCase().contains(search_description.toLowerCase())) {
 
-            StringBuilder itemBuilder = new StringBuilder();
-            itemBuilder.append("### ");
-            boolean takeIt = false;
+                if (sortedName.substring(0, 1).toUpperCase().compareTo(firstChar.trim()) != 0) {
+                    firstChar = sortedName.substring(0, 1).toUpperCase();
+                    builder.append("<a name=\"" + firstChar + "\"></a>\n");
+                    builder.append("\n## " + firstChar + "\n");
 
-            boolean isClij = false;
-            boolean isClij2 = false;
-            boolean isClijx = false;
+                    listOfChars = listOfChars.replace(" " + firstChar, "<a href=\"#" + firstChar + "\">\\[" + firstChar + "\\]</a>");
+                }
 
-            if (item.klass == Kernels.class) {
-                itemBuilder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/>");
-                itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
-                itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
-                takeIt = true;
-            } else {
-                if (service.getCLIJMacroPlugin("CLIJ_" + item.methodName) != null) {
-                    isClij = true;
-                    takeIt = true;
+                StringBuilder itemBuilder = new StringBuilder();
+                itemBuilder.append("### ");
+                boolean takeIt = false;
+
+                boolean isClij = false;
+                boolean isClij2 = false;
+                boolean isClijx = false;
+
+                if (item.klass == Kernels.class) {
                     itemBuilder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/>");
-                } else {
                     itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
-                }
-                if (service.getCLIJMacroPlugin("CLIJ2_" + item.methodName) != null) {
-                    isClij2 = true;
+                    itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
                     takeIt = true;
-                    itemBuilder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/>");
                 } else {
-                    itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
+                    if (service.getCLIJMacroPlugin("CLIJ_" + item.methodName) != null) {
+                        isClij = true;
+                        takeIt = true;
+                        itemBuilder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/>");
+                    } else {
+                        itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
+                    }
+                    if (service.getCLIJMacroPlugin("CLIJ2_" + item.methodName) != null) {
+                        isClij2 = true;
+                        takeIt = true;
+                        itemBuilder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/>");
+                    } else {
+                        itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
+                    }
+                    if (service.getCLIJMacroPlugin("CLIJx_" + item.methodName) != null) {
+                        isClijx = true;
+                        takeIt = true;
+                        itemBuilder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/>");
+                    } else {
+                        itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
+                    }
                 }
-                if (service.getCLIJMacroPlugin("CLIJx_" + item.methodName) != null) {
-                    isClijx = true;
-                    takeIt = true;
-                    itemBuilder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/>");
-                } else {
-                    itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
+
+                itemBuilder.append("<a href=\"" + HTTP_ROOT + "reference_" + item.methodName + "\">");
+                itemBuilder.append(item.methodName);
+                //if (item.klass == Kernels.class) {
+                //    builder.append("'");
+                //}
+                if (isClij && (!isClij2)) {
+                    itemBuilder.append(" (Deprecated)");
                 }
-            }
+                if ((!isClij) && (!isClij2) && isClijx) {
+                    itemBuilder.append(" (Experimental)");
+                }
+                itemBuilder.append("</a>  \n");
 
-            itemBuilder.append("<a href=\"" + HTTP_ROOT + "reference_" + item.methodName + "\">");
-            itemBuilder.append(item.methodName);
-            //if (item.klass == Kernels.class) {
-            //    builder.append("'");
-            //}
-            if (isClij && (!isClij2)) {
-                itemBuilder.append(" (Deprecated)");
-            }
-            if ((!isClij) && (!isClij2) && isClijx) {
-                itemBuilder.append(" (Experimental)");
-            }
-            itemBuilder.append("</a>  \n");
+                if (item.description != null) {
+                    String shortDescription = item.description.split("\n\n")[0];
+                    shortDescription = shortDescription.replace("\n", " ");
+                    itemBuilder.append(shortDescription + "\n\n");
+                }
 
-            if (item.description != null) {
-                String shortDescription = item.description.split("\n\n")[0];
-                shortDescription = shortDescription.replace("\n", " ");
-                itemBuilder.append(shortDescription + "\n\n");
-            }
-
-            if (takeIt) {
-                builder.append(itemBuilder.toString());
+                if (takeIt) {
+                    builder.append(itemBuilder.toString());
+                }
             }
         }
 
 
         File outputTarget = new File("../clij2-docs/reference.md");
-
+        if (search_string.length()> 0) {
+            outputTarget = new File("../clij2-docs/reference__" + search_string + ".md");
+        }
         FileWriter writer = new FileWriter(outputTarget);
         writer.write(builder.toString().replace("##ALPHABET##", listOfChars));
         writer.close();
