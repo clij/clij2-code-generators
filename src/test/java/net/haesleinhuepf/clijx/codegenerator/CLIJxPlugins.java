@@ -438,7 +438,9 @@ public interface CLIJxPlugins {
             MeanYProjection.class,
             SquaredDifference.class,
             AbsoluteDifference.class,
-            ReplacePixelsIfZero.class
+            ReplacePixelsIfZero.class,
+            VoronoiLabeling.class,
+            ExtendLabelingViaVoronoi.class
     };
 
     public String blockList = ";" +
