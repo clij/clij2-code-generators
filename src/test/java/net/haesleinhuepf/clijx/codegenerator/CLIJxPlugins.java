@@ -440,7 +440,23 @@ public interface CLIJxPlugins {
             AbsoluteDifference.class,
             ReplacePixelsIfZero.class,
             VoronoiLabeling.class,
-            ExtendLabelingViaVoronoi.class
+            ExtendLabelingViaVoronoi.class,
+            FindMaxima.class,
+            MergeTouchingLabels.class,
+            AverageNeighborDistanceMap.class,
+            CylinderTransform.class,
+            DetectAndLabelMaxima.class,
+            DrawDistanceMeshBetweenTouchingLabels.class,
+            DrawMeshBetweenTouchingLabels.class,
+            ExcludeLabelsOutsideSizeRange.class,
+            ExtendLabelsWithMaximumRadius.class,
+            FindAndLabelMaxima.class,
+            MakeIsotropic.class,
+            TouchingNeighborCountMap.class,
+            RigidTransform.class,
+            SphereTransform.class,
+            SubtractGaussianBackground.class,
+            ThresholdDoG.class
     };
 
     public String blockList = ";" +
