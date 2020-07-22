@@ -58,6 +58,7 @@ public class DocumentationGenerator {
 
             int methodCount = 0;
             for (Class klass : CLIJxPlugins.classes) {
+                boolean has_static_methods = false;
                 for (Method method : sort(klass.getMethods())) {
                     if (Modifier.isStatic(method.getModifiers()) &&
                             Modifier.isPublic(method.getModifiers()) &&
@@ -68,6 +69,7 @@ public class DocumentationGenerator {
                             OpGenerator.blockListOk(klass, method) //&&
                             //((!processedNames.contains(";" + method.getName()  + ";")) || (methodMap.get(method.getName()) != null && methodMap.get(method.getName()).description == null))
                     ) {
+                        has_static_methods = true;
                         String methodName = method.getName();
                         String returnType = typeToString(method.getReturnType());
                         String parametersHeader = "";
@@ -153,7 +155,48 @@ public class DocumentationGenerator {
                             System.out.println("NOT Parsed2 " + method.getName());
                         }
                     }
+                }
+                if (!has_static_methods) {
+                    DocumentationItem item = new DocumentationItem();
 
+                    item.klass = klass;
+                    item.methodName = klass.getSimpleName().substring(0,1).toLowerCase() + klass.getSimpleName().substring(1);
+                    CLIJMacroPlugin plugin = findPlugin(service, item.methodName);
+
+                    if (plugin != null) {
+                        System.out.println("Adding " + klass + " which doesn't have static methods.");
+
+                        item.parametersMacro = plugin.getParameterHelpText();
+                        if (plugin instanceof OffersDocumentation) {
+                            item.description = ((OffersDocumentation) plugin).getDescription();
+                            item.description = item.description.replace("deprecated", "<b>deprecated</b>");
+                        }
+                        if (plugin instanceof HasAuthor) {
+                            item.author = ((HasAuthor) plugin).getAuthorName();
+                        }
+                        if (plugin instanceof HasLicense) {
+                            item.license = ((HasLicense) plugin).getLicense();
+                        }
+                        if (plugin instanceof IsCategorized) {
+                            item.categories = ((IsCategorized) plugin).getCategories();
+                        }
+
+                        if (methodMap.containsKey(item.methodName)) {
+                            if (!item.parametersCall.contains("arg1")) {
+
+                                methodMap.remove(item.methodName);
+                                methodMap.put(item.methodName, item);
+                            }
+                        } else {
+                            methodMap.put(item.methodName, item);
+                        }
+
+                        methodCount++;
+                        processedNames = processedNames + item.methodName + ";";
+
+                    } else {
+                        System.out.println("plugin not found " + item.methodName);
+                    }
                 }
             }
 
@@ -278,7 +321,7 @@ public class DocumentationGenerator {
                 builder.append("\n\n");
             }
 
-            if (!item.parametersCall.contains("arg1")) {
+            if (item.parametersCall != null && !item.parametersCall.contains("arg1")) {
                 String javaCode = generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
                 if (javaCode != null) {
                     builder.append("\n\n### Usage in Java\n");
@@ -843,6 +886,7 @@ public class DocumentationGenerator {
 
     protected static String searchForExampleScripts(String searchFor, String searchinFolder, String baseLink, String language) {
         StringBuilder result = new StringBuilder();
+        //System.out.println(searchinFolder);
         for (File file : new File(searchinFolder).listFiles()) {
             if (!file.isDirectory()) {
                 String content = readFile(file.getAbsolutePath());

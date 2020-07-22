@@ -293,6 +293,8 @@ public interface CLIJxPlugins {
             Push.class,
             PushCurrentSlice.class,
             PushCurrentZStack.class,
+            PushCurrentSelection.class,
+            PushCurrentSliceSelection.class,
             Release.class,
             AddImageAndScalar.class,
             DetectMinimaBox.class,
