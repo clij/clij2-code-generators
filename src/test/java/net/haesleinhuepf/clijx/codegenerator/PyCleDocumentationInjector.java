@@ -18,7 +18,14 @@ import static net.haesleinhuepf.clijx.codegenerator.CompareCLIJ1andCLIJ2MacroAPI
 
 public class PyCleDocumentationInjector {
 
-    final static String pycle_path = "C:/structure/code/pyclesperanto_prototype/clesperanto/plugins/";
+    final static String pycle_path = "C:/structure/code/pyclesperanto_prototype/clesperanto/";
+    final static String[] sub_folders = {
+            "_tier0",
+            "_tier1",
+            "_tier2",
+            "_tier3",
+            "_tier4"
+    };
 
 
     public static void main(String[] args) throws IOException {
@@ -33,61 +40,62 @@ public class PyCleDocumentationInjector {
         for (String clij2macroMethodName : allMethods) {
             if (clij2macroMethodName.startsWith("CLIJ2_")) {
 
-
                 String name = niceName(clij2macroMethodName);
-                String filename = pycle_path + name + ".py";
-                //System.out.println(filename);
-                if (new File(filename).exists()) {
-                    //System.out.println("ex " + clij2macroMethodName);
+                for (String sub_folder : sub_folders) {
+                    String filename = pycle_path + sub_folder + "/" + name + ".py";
+                    //System.out.println(filename);
+                    if (new File(filename).exists()) {
+                        //System.out.println("ex " + clij2macroMethodName);
 
-                    String content = new String(Files.readAllBytes(Paths.get(filename)));
-                    String[] temp = content.split("\"\"\"");
-                    if (temp.length > 2) {
-                        clij2macroMethodName = clij2macroMethodName.split("\\(")[0];
+                        String content = new String(Files.readAllBytes(Paths.get(filename)));
+                        String[] temp = content.split("\"\"\"");
+                        if (temp.length > 2) {
+                            clij2macroMethodName = clij2macroMethodName.split("\\(")[0];
 
-                        System.out.println("cnt" + clij2macroMethodName);
+                            System.out.println("cnt" + clij2macroMethodName);
 
-                        CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(clij2macroMethodName);
+                            CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(clij2macroMethodName);
 
-                        StringBuilder documentation = new StringBuilder();
-                        if (plugin instanceof OffersDocumentation) {
+                            StringBuilder documentation = new StringBuilder();
+                            if (plugin instanceof OffersDocumentation) {
 
-                            documentation.append(((OffersDocumentation) plugin).getDescription().replace("\n", "\n    ") + "\n\n");
-                        }
-                        if (plugin instanceof HasAuthor) {
-                            documentation.append("    Author(s): " + ((HasAuthor) plugin).getAuthorName() + "\n\n");
-                        }
-                        if (plugin instanceof HasLicense) {
-                            documentation.append("    License: " + ((HasLicense) plugin).getLicense() + "\n\n");
-                        }
-                        if (plugin instanceof OffersDocumentation){
-                            documentation.append("    Available for: " + ((OffersDocumentation) plugin).getAvailableForDimensions() + "\n\n");
-                        }
-
-
-                        String[] parameters = plugin.getParameterHelpText().split(",");
-
-                        documentation.append("    Parameters\n" +
-                                             "    ----------\n" +
-                                             "    (" + plugin.getParameterHelpText() + ")\n" +
-                                             "    todo: Better documentation will follow\n");
-                        documentation.append("          In the meantime, read more: https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.replace("CLIJ2_", "") + "\n\n");
-
-
-                        documentation.append("\n    Returns\n" +
-                                             "    -------\n\n    ");
-
-                        temp[1] = documentation.toString();
-
-                        content = "";
-                        for (int i = 0; i < temp.length; i++) {
-                            if (i > 0) {
-                                content = content + "\"\"\"";
+                                documentation.append(((OffersDocumentation) plugin).getDescription().replace("\n", "\n    ") + "\n\n");
                             }
-                            content = content + temp[i];
-                        }
+                            if (plugin instanceof HasAuthor) {
+                                documentation.append("    Author(s): " + ((HasAuthor) plugin).getAuthorName() + "\n\n");
+                            }
+                            if (plugin instanceof HasLicense) {
+                                documentation.append("    License: " + ((HasLicense) plugin).getLicense() + "\n\n");
+                            }
+                            if (plugin instanceof OffersDocumentation) {
+                                documentation.append("    Available for: " + ((OffersDocumentation) plugin).getAvailableForDimensions() + "\n\n");
+                            }
 
-                        Files.write(Paths.get(filename), content.getBytes());
+
+                            String[] parameters = plugin.getParameterHelpText().split(",");
+
+                            documentation.append("    Parameters\n" +
+                                    "    ----------\n" +
+                                    "    (" + plugin.getParameterHelpText() + ")\n" +
+                                    "    todo: Better documentation will follow\n");
+                            documentation.append("          In the meantime, read more: https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.replace("CLIJ2_", "") + "\n\n");
+
+
+                            documentation.append("\n    Returns\n" +
+                                    "    -------\n\n    ");
+
+                            temp[1] = documentation.toString();
+
+                            content = "";
+                            for (int i = 0; i < temp.length; i++) {
+                                if (i > 0) {
+                                    content = content + "\"\"\"";
+                                }
+                                content = content + temp[i];
+                            }
+
+                            Files.write(Paths.get(filename), content.getBytes());
+                        }
                     }
                 }
             }
