@@ -458,7 +458,15 @@ public interface CLIJxPlugins {
             RigidTransform.class,
             SphereTransform.class,
             SubtractGaussianBackground.class,
-            ThresholdDoG.class
+            ThresholdDoG.class,
+            DriftCorrectionByCenterOfMassFixation.class,
+            DriftCorrectionByCentroidFixation.class,
+            IntensityCorrection.class,
+            IntensityCorrectionAboveThresholdOtsu.class,
+            LabelMeanIntensityMap.class,
+            LabelStandardDeviationIntensityMap.class,
+            LabelPixelCountMap.class,
+            ParametricWatershed.class
     };
 
     public String blockList = ";" +
