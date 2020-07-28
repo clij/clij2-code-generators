@@ -467,7 +467,9 @@ public interface CLIJxPlugins {
             LabelStandardDeviationIntensityMap.class,
             LabelPixelCountMap.class,
             ParametricWatershed.class,
-            MeanZProjectionAboveThreshold.class
+            MeanZProjectionAboveThreshold.class,
+            CentroidsOfBackgroundAndLabels.class,
+            SeededWatershed.class
     };
 
     public String blockList = ";" +
