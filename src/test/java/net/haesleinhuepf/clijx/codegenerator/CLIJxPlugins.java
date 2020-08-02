@@ -469,7 +469,28 @@ public interface CLIJxPlugins {
             ParametricWatershed.class,
             MeanZProjectionAboveThreshold.class,
             CentroidsOfBackgroundAndLabels.class,
-            SeededWatershed.class
+            SeededWatershed.class,
+            PushMetaData.class,
+            PopMetaData.class,
+            ResetMetaData.class,
+            AverageDistanceOfNClosestNeighborsMap.class,
+            DrawTouchCountMeshBetweenTouchingLabels.class,
+            LocalMaximumAverageDistanceOfNClosestNeighborsMap.class,
+            LocalMaximumAverageNeighborDistanceMap.class,
+            LocalMaximumTouchingNeighborCountMap.class,
+            LocalMeanAverageDistanceOfNClosestNeighborsMap.class,
+            LocalMeanAverageNeighborDistanceMap.class,
+            LocalMeanTouchingNeighborCountMap.class,
+            LocalMeanTouchPortionMap.class,
+            LocalMedianAverageDistanceOfNClosestNeighborsMap.class,
+            LocalMedianAverageNeighborDistanceMap.class,
+            LocalMedianTouchingNeighborCountMap.class,
+            LocalMinimumAverageDistanceOfNClosestNeighborsMap.class,
+            LocalMinimumAverageNeighborDistanceMap.class,
+            LocalMinimumTouchingNeighborCountMap.class,
+            LocalStandardDeviationAverageDistanceOfNClosestNeighborsMap.class,
+            LocalStandardDeviationAverageNeighborDistanceMap.class,
+            LocalStandardDeviationTouchingNeighborCountMap.class
     };
 
     public String blockList = ";" +
