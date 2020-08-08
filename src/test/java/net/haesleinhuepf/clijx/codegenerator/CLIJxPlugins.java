@@ -490,7 +490,16 @@ public interface CLIJxPlugins {
             LocalMinimumTouchingNeighborCountMap.class,
             LocalStandardDeviationAverageDistanceOfNClosestNeighborsMap.class,
             LocalStandardDeviationAverageNeighborDistanceMap.class,
-            LocalStandardDeviationTouchingNeighborCountMap.class
+            LocalStandardDeviationTouchingNeighborCountMap.class,
+            LabelMinimumIntensityMap.class,
+            LabelMaximumIntensityMap.class,
+            LabelMaximumExtensionRatioMap.class,
+            LabelMaximumExtensionMap.class,
+            GenerateIntegerGreyValueCooccurrenceCountMatrixHalfBox.class,
+            GenerateIntegerGreyValueCooccurrenceCountMatrixHalfDiamond.class,
+            GetMeanOfMaskedPixels.class,
+            DivideByGaussianBackground.class,
+            GenerateGreyValueCooccurrenceMatrixBox.class
     };
 
     public String blockList = ";" +
