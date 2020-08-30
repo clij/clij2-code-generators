@@ -499,7 +499,9 @@ public interface CLIJxPlugins {
             GenerateIntegerGreyValueCooccurrenceCountMatrixHalfDiamond.class,
             GetMeanOfMaskedPixels.class,
             DivideByGaussianBackground.class,
-            GenerateGreyValueCooccurrenceMatrixBox.class
+            GenerateGreyValueCooccurrenceMatrixBox.class,
+            GreyLevelAtttributeFiltering.class,
+            BinaryFillHolesSliceBySlice.class
     };
 
     public String blockList = ";" +
