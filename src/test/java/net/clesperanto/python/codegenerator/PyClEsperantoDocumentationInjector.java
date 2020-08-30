@@ -1,4 +1,4 @@
-package net.haesleinhuepf.clijx.codegenerator;
+package net.clesperanto.python.codegenerator;
 
 import net.haesleinhuepf.clij.macro.CLIJMacroPlugin;
 import net.haesleinhuepf.clij.macro.CLIJMacroPluginService;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 import static net.haesleinhuepf.clijx.codegenerator.CompareCLIJ1andCLIJ2MacroAPI.getMethods;
 
-public class PyCleDocumentationInjector {
+public class PyClEsperantoDocumentationInjector {
 
     final static String pycle_path = "C:/structure/code/pyclesperanto_prototype/clesperanto/";
     final static String[] sub_folders = {
