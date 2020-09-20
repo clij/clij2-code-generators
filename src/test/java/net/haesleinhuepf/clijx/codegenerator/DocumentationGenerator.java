@@ -17,9 +17,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 import static net.haesleinhuepf.clijx.codegenerator.OpGenerator.*;
 
@@ -212,7 +210,9 @@ public class DocumentationGenerator {
             buildReference(names, methodMap, "filter", " for filtering images.");
             buildReference(names, methodMap, "matrix", " for working with matrices.");
             buildReference(names, methodMap, "label", " for processing labelled images.");
-            buildReference(names, methodMap, "neighbor", " for processing neighboring objects.");
+            buildReference(names, methodMap, "graph", " for processing graphs.");
+            buildReference(names, methodMap, "detection", " for spot detection.");
+            buildReference(names, methodMap, "segmentation", " for segmenting images.");
             buildReference(names, methodMap, "transform", " for transforming images in space.");
             buildReference(names, methodMap, "math", " for performing general mathematical operations on images.");
             buildReference(names, methodMap, "measurement", " for performing measurements in images.");
@@ -281,6 +281,21 @@ public class DocumentationGenerator {
 
             builder.append(item.description);
 
+            if (item.categories != null) {
+                String[] categories = item.categories.split(",");
+                List<String> list = new ArrayList<>();
+                for (int i = 0; i < categories.length; i++) {
+                    list.add(categories[i]);
+                }
+                Collections.sort(list);
+                if (categories.length > 1) {
+                    builder.append("\n\nCategories: ");
+                } else {
+                    builder.append("\n\nCategory: ");
+                }
+                builder.append(linkCategories(list));
+            }
+
             if (item.klass.getPackage().toString().contains(".clij2.")) {
                 //if (item.methodName.compareTo("generateTouchMatrix") == 0 ) {
                 //    System.out.println("Search for "+ item.methodName);
@@ -323,24 +338,23 @@ public class DocumentationGenerator {
 
             if (item.parametersCall != null && !item.parametersCall.contains("arg1")) {
                 String javaCode = generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
-                if (javaCode != null) {
-                    builder.append("\n\n### Usage in Java\n");
-                    builder.append(javaCode);
-                    builder.append("\n\n");
-                }
-
                 String matlabCode = generateMatlabExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
-                if (matlabCode != null) {
-                    builder.append("\n\n### Usage in Matlab\n");
-                    builder.append(matlabCode);
-                    builder.append("\n\n");
-                }
-
-
                 String icyCode = generateIcyExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
-                if (matlabCode != null) {
-                    builder.append("\n\n### Usage in Icy\n");
-                    builder.append(icyCode);
+
+                if (javaCode != null || matlabCode != null || icyCode != null) {
+                     builder.append("### Usage in object oriented programming languages\n\n");
+
+                     if (javaCode != null) {
+                         builder.append(codeBlock("Java", javaCode));
+                     }
+
+                     if (matlabCode != null) {
+                         builder.append(codeBlock("Matlab", matlabCode));
+                     }
+
+                     if (icyCode != null) {
+                         builder.append(codeBlock("Icy JavaScript", icyCode));
+                     }
                     builder.append("\n\n");
                 }
             }
@@ -386,6 +400,62 @@ public class DocumentationGenerator {
         }
     }
 
+    private static String codeBlock(String headline, String text) {
+        StringBuilder code = new StringBuilder();
+
+        code.append("\n\n<details>\n\n");
+        code.append("<summary>\n");
+        code.append("" + headline + "\n");
+
+        code.append("</summary>\n");
+        code.append(text);
+        code.append("\n\n</details>\n\n");
+
+        return code.toString();
+    }
+
+    private static String linkCategories(Iterable<String> list) {
+        StringBuilder builder = new StringBuilder();
+
+        int count = 0;
+        for (String entry : list) {
+            if (count > 0) {
+                builder.append(", ");
+            }
+
+            if (entry.toLowerCase().contains("binary")) {
+                builder.append("[Binary](https://clij.github.io/clij2-docs/reference__binary)");
+            } else if (entry.toLowerCase().contains("filter")) {
+                builder.append("[Filter](https://clij.github.io/clij2-docs/reference__filter)");
+            } else if (entry.toLowerCase().contains("graph")) {
+                builder.append("[Graphs](https://clij.github.io/clij2-docs/reference__graph)");
+            } else if (entry.toLowerCase().contains("label")) {
+                builder.append("[Labels](https://clij.github.io/clij2-docs/reference__label)");
+            } else if (entry.toLowerCase().contains("math")) {
+                builder.append("[Math](https://clij.github.io/clij2-docs/reference__math)");
+            } else if (entry.toLowerCase().contains("matrix")) {
+                builder.append("[Matrices](https://clij.github.io/clij2-docs/reference__matrix)");
+            } else if (entry.toLowerCase().contains("measurement")) {
+                builder.append("[Measurements](https://clij.github.io/clij2-docs/reference__measurement)");
+            } else if (entry.toLowerCase().contains("project")) {
+                builder.append("[Projections](https://clij.github.io/clij2-docs/reference__project)");
+            } else if (entry.toLowerCase().contains("transform")) {
+                builder.append("[Transformations](https://clij.github.io/clij2-docs/reference__transform)");
+            } else if (entry.toLowerCase().contains("segmentation")) {
+                builder.append("[Segmentation](https://clij.github.io/clij2-docs/reference__segmentation)");
+            } else if (entry.toLowerCase().contains("detection")) {
+                builder.append("[Detection](https://clij.github.io/clij2-docs/reference__detection)");
+            } else {
+                builder.append(entry);
+            }
+
+            count++;
+        }
+
+
+        return builder.toString();
+    }
+
     private static String generateJavaExampleCode(Class klass, String methodName, String parametersWithType, String parameters, String returnType) {
         parameters = parameters.replace("clij, ", "");
         parameters = parameters.replace("clij2, ", "");
@@ -402,11 +472,6 @@ public class DocumentationGenerator {
         StringBuilder code = new StringBuilder();
 
         String clijObjectName = "clij2";
-
-        code.append("\n\n<details>\n\n");
-        code.append("<summary>\n");
-        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
-        code.append("</summary>\n");
 
         code.append("<pre class=\"highlight\">");
         code.append("// init CLIJ and GPU\n");
@@ -468,7 +533,7 @@ public class DocumentationGenerator {
         code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
         code.append("</pre>\n\n<pre class=\"highlight\">");
 
-        code.append("\n//show result\n");
+        code.append("\n// show result\n");
         if (returnType.toLowerCase().compareTo("boolean") != 0) {
             code.append("System.out.println(result" + methodName.substring(0,1).toUpperCase() + methodName.substring(1, methodName.length()) + ");\n");
         }
@@ -492,7 +557,6 @@ public class DocumentationGenerator {
         }
         code.append("</pre>");
 
-        code.append("\n\n</details>\n\n");
         return code.toString();
     }
 
@@ -513,11 +577,6 @@ public class DocumentationGenerator {
         StringBuilder code = new StringBuilder();
         String clijObjectName = "clij2";;
 
-
-        code.append("\n\n<details>\n\n");
-        code.append("<summary>\n");
-        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
-        code.append("</summary>\n");
         code.append("<pre class=\"highlight\">");
 
         code.append("// init CLIJ and GPU\n");
@@ -594,8 +653,6 @@ public class DocumentationGenerator {
         }
         code.append("</pre>");
 
-        code.append("\n\n</details>\n\n");
-
         return code.toString();
     }
 
@@ -616,10 +673,6 @@ public class DocumentationGenerator {
         StringBuilder code = new StringBuilder();
         String clijObjectName = "clij2";
 
-        code.append("\n\n<details>\n\n");
-        code.append("<summary>\n");
-        code.append(clijObjectName + "." + methodName + "(" + parameters + ");\n");
-        code.append("</summary>\n");
 
         code.append("<pre class=\"highlight\">");
         code.append("% init CLIJ and GPU\n");
@@ -692,7 +745,6 @@ public class DocumentationGenerator {
 
         code.append("</pre>");
 
-        code.append("\n\n</details>\n\n");
         return code.toString();
     }
 
@@ -714,15 +766,8 @@ public class DocumentationGenerator {
         builder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJx (experimental release)  \n");
 
         builder.append("\n\n\n__Categories:__ ");
-        builder.append("[Binary](https://clij.github.io/clij2-docs/reference__binary)");
-        builder.append(", [Filter](https://clij.github.io/clij2-docs/reference__filter)");
-        builder.append(", [Labels](https://clij.github.io/clij2-docs/reference__label)");
-        builder.append(", [Math](https://clij.github.io/clij2-docs/reference__math)");
-        builder.append(", [Matrices](https://clij.github.io/clij2-docs/reference__matrix)");
-        builder.append(", [Measurements](https://clij.github.io/clij2-docs/reference__measurement)");
-        builder.append(", [Neighbors](https://clij.github.io/clij2-docs/reference__neighbor)");
-        builder.append(", [Projections](https://clij.github.io/clij2-docs/reference__project)");
-        builder.append(", [Transformations](https://clij.github.io/clij2-docs/reference__transform)");
+        builder.append(linkCategories(Arrays.asList(new String("Binary,Filter,Graphs,Labels,Math,Matrices,Measurements,Projections,Transformations").split(","))));
+
 
         builder.append("\n\n##ALPHABET##\n\n");
 
