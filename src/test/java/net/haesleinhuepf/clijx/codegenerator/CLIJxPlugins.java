@@ -501,7 +501,10 @@ public interface CLIJxPlugins {
             DivideByGaussianBackground.class,
             GenerateGreyValueCooccurrenceMatrixBox.class,
             GreyLevelAtttributeFiltering.class,
-            BinaryFillHolesSliceBySlice.class
+            BinaryFillHolesSliceBySlice.class,
+            BinaryWekaPixelClassifier.class,
+            WekaLabelClassifier.class,
+            GenerateLabelFeatureImage.class
     };
 
     public String blockList = ";" +
