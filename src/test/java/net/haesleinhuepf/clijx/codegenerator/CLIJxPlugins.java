@@ -504,7 +504,9 @@ public interface CLIJxPlugins {
             BinaryFillHolesSliceBySlice.class,
             BinaryWekaPixelClassifier.class,
             WekaLabelClassifier.class,
-            GenerateLabelFeatureImage.class
+            GenerateLabelFeatureImage.class,
+            LabelSurface.class,
+            ReduceLabelsToLabelledSpots.class
     };
 
     public String blockList = ";" +
