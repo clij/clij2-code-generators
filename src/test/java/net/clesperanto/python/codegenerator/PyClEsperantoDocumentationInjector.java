@@ -18,13 +18,14 @@ import static net.haesleinhuepf.clijx.codegenerator.CompareCLIJ1andCLIJ2MacroAPI
 
 public class PyClEsperantoDocumentationInjector {
 
-    final static String pycle_path = "C:/structure/code/pyclesperanto_prototype/clesperanto/";
+    final static String pycle_path = "C:/structure/code/pyclesperanto_prototype/pyclesperanto_prototype/";
     final static String[] sub_folders = {
             "_tier0",
             "_tier1",
             "_tier2",
             "_tier3",
-            "_tier4"
+            "_tier4",
+            "_tier9"
     };
 
 
@@ -42,13 +43,14 @@ public class PyClEsperantoDocumentationInjector {
 
                 String name = niceName(clij2macroMethodName);
                 for (String sub_folder : sub_folders) {
-                    String filename = pycle_path + sub_folder + "/" + name + ".py";
-                    //System.out.println(filename);
+                    String filename = pycle_path + sub_folder + "/_" + name + ".py";
+                    System.out.println(filename);
                     if (new File(filename).exists()) {
-                        //System.out.println("ex " + clij2macroMethodName);
+                        System.out.println("ex " + clij2macroMethodName);
 
                         String content = new String(Files.readAllBytes(Paths.get(filename)));
                         String[] temp = content.split("\"\"\"");
+                        System.out.println(temp.length);
                         if (temp.length > 2) {
                             clij2macroMethodName = clij2macroMethodName.split("\\(")[0];
 
@@ -57,9 +59,12 @@ public class PyClEsperantoDocumentationInjector {
                             CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(clij2macroMethodName);
 
                             StringBuilder documentation = new StringBuilder();
-                            if (plugin instanceof OffersDocumentation) {
 
-                                documentation.append(((OffersDocumentation) plugin).getDescription().replace("\n", "\n    ") + "\n\n");
+                            boolean numpy_style_parameters_contained = false;
+                            if (plugin instanceof OffersDocumentation) {
+                                String desc = ((OffersDocumentation) plugin).getDescription();
+                                documentation.append(desc.replace("\n", "\n    ") + "\n\n");
+                                numpy_style_parameters_contained = plugin.getParameterHelpText().contains("Parameters\n----");
                             }
                             if (plugin instanceof HasAuthor) {
                                 documentation.append("    Author(s): " + ((HasAuthor) plugin).getAuthorName() + "\n\n");
@@ -71,18 +76,33 @@ public class PyClEsperantoDocumentationInjector {
                                 documentation.append("    Available for: " + ((OffersDocumentation) plugin).getAvailableForDimensions() + "\n\n");
                             }
 
-
                             String[] parameters = plugin.getParameterHelpText().split(",");
 
-                            documentation.append("    Parameters\n" +
+                            if (!numpy_style_parameters_contained) {
+                                documentation.append("    Parameters\n" +
+                                        "    ----------\n");
+                                for (String param : plugin.getParameterHelpText().split(",")) {
+                                    documentation.append(
+                                        "    " + param + "\n");
+                                }
+
+                                documentation.append("\n    Returns\n" +
+                                        "    -------\n\n    ");
+                            }
+
+                            documentation.append(
+                                    "    Examples\n" +
+                                    "    --------\n" +
+                                    "    \n" +
+                                    "    ");
+
+                            documentation.append(
+                                    "    References\n" +
                                     "    ----------\n" +
-                                    "    (" + plugin.getParameterHelpText() + ")\n" +
-                                    "    todo: Better documentation will follow\n");
-                            documentation.append("          In the meantime, read more: https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.replace("CLIJ2_", "") + "\n\n");
+                                    "    .. [1] https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.replace("CLIJ2_", "") +
+                                    "    \n\n"
+                            );
 
-
-                            documentation.append("\n    Returns\n" +
-                                    "    -------\n\n    ");
 
                             temp[1] = documentation.toString();
 
@@ -145,6 +165,26 @@ public class PyClEsperantoDocumentationInjector {
                 result = result + ch;
             }
         }
+        result = result.replace("paste3_d", "paste");
+        result = result.replace("minimum3_d", "minimum");
+        result = result.replace("maximum3_d", "maximum");
+        result = result.replace("mean3_d", "mean");
+        result = result.replace("blur3_d", "blur");
+        result = result.replace("flip3_d", "flip");
+        result = result.replace("crop3_d", "crop");
+        result = result.replace("_x_or", "_xor");
+        result = result.replace("_x_y", "_xy");
+        result = result.replace("_x_z", "_xz");
+        result = result.replace("_y_z", "_yz");
+        result = result.replace("2_d", "2d");
+        result = result.replace("3_d", "3d");
+        result = result.replace("_point_list", "_pointlist");
+        result = result.replace("xgreater", "x_greater");
+        result = result.replace("xsmaller", "x_smaller");
+        result = result.replace("xequals", "x_equals");
+        result = result.replace("_pixelindex", "_pixel_index");
+
+
 
         //result = result.replace("_", "\n");
         //result = result.replace(" ", "\n");
