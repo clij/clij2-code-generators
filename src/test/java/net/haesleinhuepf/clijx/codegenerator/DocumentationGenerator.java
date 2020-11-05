@@ -11,12 +11,16 @@ import net.haesleinhuepf.clij2.utilities.IsCategorized;
 import net.haesleinhuepf.clijx.CLIJx;
 import net.haesleinhuepf.clij2.utilities.HasAuthor;
 import net.haesleinhuepf.clij2.utilities.HasLicense;
+import net.haesleinhuepf.clijx.assistant.scriptgenerator.PyclesperantoGenerator;
+import net.haesleinhuepf.clijx.assistant.utilities.AssistantUtilities;
 import org.scijava.Context;
 
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static net.haesleinhuepf.clijx.codegenerator.OpGenerator.*;
@@ -266,6 +270,12 @@ public class DocumentationGenerator {
                     builder.append("<img src=\"images/mini_empty_logo.png\"/>");
                 }
             }
+            if (isPartOfClEsperanto(item.methodName)) {
+                builder.append("<img src=\"images/mini_cle_logo.png\"/>");
+            } else {
+                builder.append("<img src=\"images/mini_empty_logo.png\"/>");
+            }
+
 
             builder.append("\n\n");
             if (item.author != null && item.author.length() > 0) {
@@ -340,6 +350,8 @@ public class DocumentationGenerator {
                 String javaCode = generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
                 String matlabCode = generateMatlabExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
                 String icyCode = generateIcyExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
+                String cle_python_code = generateClePythonCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
+                String clic_code = generateCLIcCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
 
                 if (javaCode != null || matlabCode != null || icyCode != null) {
                      builder.append("### Usage in object oriented programming languages\n\n");
@@ -355,6 +367,14 @@ public class DocumentationGenerator {
                      if (icyCode != null) {
                          builder.append(codeBlock("Icy JavaScript", icyCode));
                      }
+
+                    if (cle_python_code != null) {
+                        builder.append(codeBlock("clEsperanto Python (experimental)", cle_python_code));
+                    }
+
+                    if (clic_code != null) {
+                        builder.append(codeBlock("clEsperanto CLIc C++ (experimental)", clic_code));
+                    }
                     builder.append("\n\n");
                 }
             }
@@ -399,6 +419,81 @@ public class DocumentationGenerator {
             writer.close();
         }
     }
+
+    private static String generateCLIcCode(Class klass, String methodName, String parametersHeader, String parametersCall, String returnType) {
+        if (AssistantUtilities.isClicCompatible(methodName)) {
+
+            StringBuilder code = new StringBuilder();
+
+            String pythonized_method_name = new PyclesperantoGenerator(false).pythonize(methodName);
+
+            code.append("<pre class=\"highlight\">");
+            if (
+                (!addFile(code, new File("../CLIc_prototype/test/" + pythonized_method_name + "_functions_test.cpp"))) &&
+                (!addFile(code, new File("../CLIc_prototype/test/" + pythonized_method_name + "_test.cpp")))
+            ) {
+                return null;
+            }
+            code.append("</pre>\n\n");
+
+            return code.toString();
+        }
+
+        return null;
+    }
+
+    private static boolean addFile(StringBuilder code, File file) {
+        if (!file.exists()) {
+            return false;
+        }
+
+        try {
+            String text = new String(Files.readAllBytes(Paths.get(file.toURI())));
+            String search = "\n    // Initialise GPU";
+            if (text.contains(search)) {
+                text = search + text.split(search)[1];
+            }
+            text = text.replace("\n    ", "\n");
+            text = text.split("// Verify output")[0];
+
+            text = text.replace("<", "&lt;");
+            text = text.replace(">", "&gt;");
+
+            code.append(text);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    private static String generateClePythonCode(Class klass, String methodName, String parametersHeader, String parametersCall, String returnType) {
+        if (AssistantUtilities.isCleCompatible(methodName)) {
+
+            parametersCall = parametersCall
+                    .replace("clij, ", "")
+                    .replace("clij2, ", "")
+                    .replace("clijx, ", "");
+
+            StringBuilder code = new StringBuilder();
+
+            code.append("<pre class=\"highlight\">");
+            code.append("import pyclesperanto_prototype as cle\n" +
+                    "\n" +
+                    "cle." + new PyclesperantoGenerator(false).pythonize(methodName) + "(" + parametersCall + ")\n");
+            code.append("\n</pre>\n\n");
+
+            return code.toString();
+        }
+        return null;
+    }
+
+    private static boolean isPartOfClEsperanto(String methodName) {
+        return AssistantUtilities.isCleCompatible(methodName) || AssistantUtilities.isClicCompatible(methodName);
+    }
+
 
     private static String codeBlock(String headline, String text) {
         StringBuilder code = new StringBuilder();
@@ -764,6 +859,7 @@ public class DocumentationGenerator {
         builder.append("<img src=\"images/mini_clij1_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ (deprecated release)  \n");
         builder.append("<img src=\"images/mini_clij2_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJ2 (stable release)  \n");
         builder.append("<img src=\"images/mini_clijx_logo.png\" width=\"18\" height=\"18\"/> Method is available in CLIJx (experimental release)  \n");
+        builder.append("<img src=\"images/mini_cle_logo.png\" width=\"18\" height=\"18\"/> Method is available in clEsperanto (experimental)  \n");
 
         builder.append("\n\n\n__Categories:__ ");
         builder.append(linkCategories(Arrays.asList(new String("Binary,Filter,Graphs,Labels,Math,Matrices,Measurements,Projections,Transformations").split(","))));
@@ -773,6 +869,7 @@ public class DocumentationGenerator {
 
         String firstChar = " ";
         String listOfChars = " A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z";
+        int count = 0;
         for (String sortedName : names) {
             DocumentationItem item = methodMap.get(sortedName);
             //System.out.println(item.klass + " >>> " + item.categories);
@@ -825,6 +922,11 @@ public class DocumentationGenerator {
                         itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
                     }
                 }
+                if (isPartOfClEsperanto(item.methodName)) {
+                    itemBuilder.append("<img src=\"images/mini_cle_logo.png\" width=\"18\" height=\"18\"/>");
+                } else {
+                    itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
+                }
 
                 itemBuilder.append("<a href=\"" + HTTP_ROOT + "reference_" + item.methodName + "\">");
                 itemBuilder.append(item.methodName);
@@ -848,8 +950,10 @@ public class DocumentationGenerator {
                 if (takeIt) {
                     builder.append(itemBuilder.toString());
                 }
+                count++;
             }
         }
+        builder.append("" + count + " methods listed.\n");
 
 
         File outputTarget = new File("../clij2-docs/reference.md");
