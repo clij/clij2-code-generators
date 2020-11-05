@@ -506,7 +506,14 @@ public interface CLIJxPlugins {
             WekaLabelClassifier.class,
             GenerateLabelFeatureImage.class,
             LabelSurface.class,
-            ReduceLabelsToLabelledSpots.class
+            ReduceLabelsToLabelledSpots.class,
+            LabelMeanExtensionMap.class,
+            MeanZProjectionBelowThreshold.class,
+            EuclideanDistanceFromLabelCentroidMap.class,
+            GammaCorrection.class,
+            ZPositionOfMaximumZProjection.class,
+            ZPositionProjection.class,
+            ZPositionRangeProjection.class
     };
 
     public String blockList = ";" +
