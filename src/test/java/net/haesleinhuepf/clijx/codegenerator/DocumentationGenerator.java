@@ -111,6 +111,7 @@ public class DocumentationGenerator {
                                 item.parametersMacro = plugin.getParameterHelpText();
                                 if (plugin instanceof OffersDocumentation) {
                                     item.description = ((OffersDocumentation) plugin).getDescription();
+                                    item.description = item.description.replace("Parameters\n----------", "### Parameters\n");
                                     item.description = item.description.replace("deprecated", "<b>deprecated</b>");
                                 }
                                 if (plugin instanceof HasAuthor) {
@@ -221,6 +222,8 @@ public class DocumentationGenerator {
             buildReference(names, methodMap, "math", " for performing general mathematical operations on images.");
             buildReference(names, methodMap, "measurement", " for performing measurements in images.");
             buildReference(names, methodMap, "project", " for projecting images.");
+            buildReference(names, methodMap, "pyclesperanto", " compatible with [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype).");
+
             buildIndiviualOperationReferences(names, methodMap);
         }
     }
@@ -540,6 +543,8 @@ public class DocumentationGenerator {
                 builder.append("[Segmentation](https://clij.github.io/clij2-docs/reference__segmentation)");
             } else if (entry.toLowerCase().contains("detection")) {
                 builder.append("[Detection](https://clij.github.io/clij2-docs/reference__detection)");
+            } else if (entry.toLowerCase().contains("pyclesperanto")) {
+                builder.append("[Detection](https://clij.github.io/clij2-docs/reference__pyclesperanto)");
             } else {
                 builder.append(entry);
             }
@@ -861,7 +866,7 @@ public class DocumentationGenerator {
         builder.append("<img src=\"images/mini_cle_logo.png\" width=\"18\" height=\"18\"/> Method is available in clEsperanto (experimental)  \n");
 
         builder.append("\n\n\n__Categories:__ ");
-        builder.append(linkCategories(Arrays.asList(new String("Binary,Filter,Graphs,Labels,Math,Matrices,Measurements,Projections,Transformations").split(","))));
+        builder.append(linkCategories(Arrays.asList(new String("Binary,Filter,Graphs,Labels,Math,Matrices,Measurements,Projections,Transformations,pyclesperanto").split(","))));
 
 
         builder.append("\n\n##ALPHABET##\n\n");
@@ -875,7 +880,9 @@ public class DocumentationGenerator {
             if (search_string.length() == 0 ||
                     (item.description != null && (item.description.toLowerCase().contains(search_string.toLowerCase()))) ||
                     (item.categories != null && item.categories.toLowerCase().contains(search_string.toLowerCase())) ||
-                    sortedName.toLowerCase().contains(search_description.toLowerCase())) {
+                    (sortedName.toLowerCase().contains(search_description.toLowerCase())) ||
+                    (search_string.compareTo("pyclesperanto") == 0 && isPartOfClEsperanto(item.methodName)))
+            {
 
                 if (sortedName.substring(0, 1).toUpperCase().compareTo(firstChar.trim()) != 0) {
                     firstChar = sortedName.substring(0, 1).toUpperCase();
