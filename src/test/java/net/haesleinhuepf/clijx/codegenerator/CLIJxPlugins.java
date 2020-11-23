@@ -513,7 +513,17 @@ public interface CLIJxPlugins {
             GammaCorrection.class,
             ZPositionOfMaximumZProjection.class,
             ZPositionProjection.class,
-            ZPositionRangeProjection.class
+            ZPositionRangeProjection.class,
+            VarianceSphere.class,
+            StandardDeviationSphere.class,
+            VarianceBox.class,
+            StandardDeviationBox.class,
+            Tenengrad.class,
+            TenengradSliceBySlice.class,
+            SobelSliceBySlice.class,
+            ExtendedDepthOfFocusSobelProjection.class,
+            ExtendedDepthOfFocusTenengradProjection.class,
+            ExtendedDepthOfFocusVarianceProjection.class
     };
 
     public String blockList = ";" +
