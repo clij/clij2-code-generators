@@ -349,7 +349,7 @@ public class DocumentationGenerator {
                 builder.append("\n\n");
             }
 
-            if (item.parametersCall != null && !item.parametersCall.contains("arg1")) {
+            if (item.parametersCall != null && !item.parametersCall.contains("arg1") && !new String("" + item.description).toLowerCase().contains("deprecated")) {
                 String javaCode = generateJavaExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
                 String matlabCode = generateMatlabExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
                 String icyCode = generateIcyExampleCode(item.klass, item.methodName, item.parametersHeader, item.parametersCall, item.returnType);
