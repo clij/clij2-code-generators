@@ -571,7 +571,6 @@ public class DocumentationGenerator {
         code.append("<pre class=\"highlight\">");
         code.append("// init CLIJ and GPU\n");
 
-
         if (klass.getPackage().toString().contains(".clij2.")) {
             code.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
             code.append("import net.haesleinhuepf.clij.clearcl.ClearCLBuffer;\n");
@@ -584,7 +583,6 @@ public class DocumentationGenerator {
             code.append("CLIJx clijx = CLIJx.getInstance();\n\n");
 
             clijObjectName = "clijx";
-            return null;
         }
         code.append("// get input parameters\n");
         String[] parametersArray = parametersWithType.split(",");
@@ -773,10 +771,11 @@ public class DocumentationGenerator {
         code.append("% init CLIJ and GPU\n");
 
         if (klass.getPackage().toString().contains(".clij2.")) {
-            code.append("clij2 = init_clatlab();\n\n");
+            code.append(clijObjectName + " = init_clatlab();\n\n");
 
         } else {
-            return null;
+            clijObjectName = "clijx";
+            code.append(clijObjectName + " = init_clatlabx();\n\n");
         }
         code.append("% get input parameters\n");
         String[] parametersArray = parametersWithType.split(",");
