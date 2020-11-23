@@ -93,7 +93,7 @@ public class CombinedUsageStats {
 
     private void addToMap(HashMap<String, Integer> followers, String consumer, String producer) {
         String key = producer + " > " + consumer;
-        int count = 1;
+        int count = 0;
         if (followers.containsKey(key)) {
             count = followers.get(key);
             followers.remove(key);
