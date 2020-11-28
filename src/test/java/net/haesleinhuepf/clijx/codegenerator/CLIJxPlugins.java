@@ -523,7 +523,9 @@ public interface CLIJxPlugins {
             SobelSliceBySlice.class,
             ExtendedDepthOfFocusSobelProjection.class,
             ExtendedDepthOfFocusTenengradProjection.class,
-            ExtendedDepthOfFocusVarianceProjection.class
+            ExtendedDepthOfFocusVarianceProjection.class,
+            DrawMeshBetweenNClosestLabels.class,
+            DrawMeshBetweenProximalLabels.class
     };
 
     public String blockList = ";" +
