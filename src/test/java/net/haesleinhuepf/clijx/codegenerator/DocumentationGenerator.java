@@ -6,7 +6,6 @@ import net.haesleinhuepf.clij.macro.CLIJMacroPlugin;
 import net.haesleinhuepf.clij.macro.CLIJMacroPluginService;
 import net.haesleinhuepf.clij.macro.documentation.OffersDocumentation;
 import net.haesleinhuepf.clij2.CLIJ2;
-import net.haesleinhuepf.clij2.plugins.Mean2DBox;
 import net.haesleinhuepf.clij2.utilities.IsCategorized;
 import net.haesleinhuepf.clijx.CLIJx;
 import net.haesleinhuepf.clij2.utilities.HasAuthor;
@@ -223,6 +222,7 @@ public class DocumentationGenerator {
             buildReference(names, methodMap, "measurement", " for performing measurements in images.");
             buildReference(names, methodMap, "project", " for projecting images.");
             buildReference(names, methodMap, "pyclesperanto", " compatible with [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype).");
+            buildReference(names, methodMap, "CLIc", " compatible with [CLIc](https://github.com/clEsperanto/CLIc_prototype).");
 
             buildIndiviualOperationReferences(names, methodMap);
         }
@@ -273,7 +273,7 @@ public class DocumentationGenerator {
                     builder.append("<img src=\"images/mini_empty_logo.png\"/>");
                 }
             }
-            if (isPartOfClEsperanto(item.methodName)) {
+            if (isPartOfPyClEsperanto(item.methodName)) {
                 builder.append("<img src=\"images/mini_cle_logo.png\"/>");
             } else {
                 builder.append("<img src=\"images/mini_empty_logo.png\"/>");
@@ -493,10 +493,13 @@ public class DocumentationGenerator {
         return null;
     }
 
-    private static boolean isPartOfClEsperanto(String methodName) {
-        return AssistantUtilities.isCleCompatible(methodName) || AssistantUtilities.isClicCompatible(methodName);
+    private static boolean isPartOfPyClEsperanto(String methodName) {
+        return AssistantUtilities.isCleCompatible(methodName);
     }
 
+    private static boolean isPartOfClEsperantoCLIc(String methodName) {
+        return AssistantUtilities.isClicCompatible(methodName);
+    }
 
     private static String codeBlock(String headline, String text) {
         StringBuilder code = new StringBuilder();
@@ -866,7 +869,7 @@ public class DocumentationGenerator {
         builder.append("<img src=\"images/mini_cle_logo.png\" width=\"18\" height=\"18\"/> Method is available in clEsperanto (experimental)  \n");
 
         builder.append("\n\n\n__Categories:__ ");
-        builder.append(linkCategories(Arrays.asList(new String("Binary,Filter,Graphs,Labels,Math,Matrices,Measurements,Projections,Transformations,pyclesperanto").split(","))));
+        builder.append(linkCategories(Arrays.asList(new String("Binary,Filter,Graphs,Labels,Math,Matrices,Measurements,Projections,Transformations,pyclesperanto,CLIc").split(","))));
 
 
         builder.append("\n\n##ALPHABET##\n\n");
@@ -881,7 +884,8 @@ public class DocumentationGenerator {
                     (item.description != null && (item.description.toLowerCase().contains(search_string.toLowerCase()))) ||
                     (item.categories != null && item.categories.toLowerCase().contains(search_string.toLowerCase())) ||
                     (sortedName.toLowerCase().contains(search_description.toLowerCase())) ||
-                    (search_string.compareTo("pyclesperanto") == 0 && isPartOfClEsperanto(item.methodName)))
+                    (search_string.compareTo("pyclesperanto") == 0 && isPartOfPyClEsperanto(item.methodName)) ||
+                    (search_string.compareTo("CLIc") == 0 && isPartOfClEsperantoCLIc(item.methodName)))
             {
 
                 if (sortedName.substring(0, 1).toUpperCase().compareTo(firstChar.trim()) != 0) {
@@ -928,7 +932,7 @@ public class DocumentationGenerator {
                         itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
                     }
                 }
-                if (isPartOfClEsperanto(item.methodName)) {
+                if (isPartOfPyClEsperanto(item.methodName) || isPartOfClEsperantoCLIc(item.methodName)) {
                     itemBuilder.append("<img src=\"images/mini_cle_logo.png\" width=\"18\" height=\"18\"/>");
                 } else {
                     itemBuilder.append("<img src=\"images/mini_empty_logo.png\" width=\"18\" height=\"18\"/>");
