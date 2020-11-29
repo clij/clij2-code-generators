@@ -8,6 +8,9 @@ import net.haesleinhuepf.clij.macro.CLIJMacroPluginService;
 import net.haesleinhuepf.clij.macro.documentation.OffersDocumentation;
 import net.haesleinhuepf.clij2.CLIJ2;
 import net.haesleinhuepf.clijx.CLIJx;
+import net.haesleinhuepf.clijx.assistant.scriptgenerator.JythonGenerator;
+import net.haesleinhuepf.clijx.assistant.scriptgenerator.PyclesperantoGenerator;
+import net.haesleinhuepf.clijx.assistant.utilities.AssistantUtilities;
 import org.scijava.Context;
 
 import java.io.*;
@@ -21,19 +24,30 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class OpGenerator {
+    static final int PLATFORM_CLIJ2 = 1;
+    static final int PLATFORM_CLIJx = 2;
+    static final int PLATFORM_CLESPERANTOJ_CAMEL = 3;
+    static final int PLATFORM_CLESPERANTOJ_SNAKE = 4;
+
     public static void main(String ... args) throws IOException {
 
-        for (boolean isCLIJ2 : new boolean[]{false, true}) {
+
+        for (int platform : new int[]{PLATFORM_CLIJ2, PLATFORM_CLIJx, PLATFORM_CLESPERANTOJ_SNAKE, PLATFORM_CLESPERANTOJ_CAMEL}) {
 
 
             CLIJMacroPluginService service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
 
             StringBuilder builder = new StringBuilder();
-            if (isCLIJ2) {
+            if (platform == PLATFORM_CLIJ2) {
                 builder.append("package net.haesleinhuepf.clij2;\n");
                 builder.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
-            } else {
+            } else if (platform == PLATFORM_CLIJx) {
                 builder.append("package net.haesleinhuepf.clijx.utilities;\n");
+                builder.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
+                builder.append("import net.haesleinhuepf.clijx.CLIJx;\n");
+                builder.append("import net.haesleinhuepf.clijx.weka.CLIJxWeka2;\n");
+            } else {
+                builder.append("package net.clesperanto.javaprototype;\n\n");
                 builder.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
                 builder.append("import net.haesleinhuepf.clijx.CLIJx;\n");
                 builder.append("import net.haesleinhuepf.clijx.weka.CLIJxWeka2;\n");
@@ -53,37 +67,65 @@ public class OpGenerator {
 
             for (Class klass : CLIJxPlugins.classes) {
                 if (
-                        (isCLIJ2 && klass.getPackage().toString().contains(".clij2.")) ||
-                        ((!isCLIJ2) && (klass.getPackage().toString().contains(".clijx.") || klass.getSimpleName().equals("Kernels")))
+                        (platform == PLATFORM_CLIJ2 && klass.getPackage().toString().contains(".clij2.")) ||
+                        ((platform == PLATFORM_CLIJx) && (klass.getPackage().toString().contains(".clijx.") || klass.getSimpleName().equals("Kernels"))) ||
+                        ((platform == PLATFORM_CLESPERANTOJ_CAMEL || platform == PLATFORM_CLESPERANTOJ_SNAKE) && (!klass.getSimpleName().equals("Kernels")))
                 ) {
                     builder.append("import " + klass.getName() + ";\n");
                 }
             }
 
             builder.append("// this is generated code. See src/test/java/net/haesleinhuepf/clijx/codegenerator for details\n");
-            if (isCLIJ2) {
+            if (platform == PLATFORM_CLIJ2) {
                 builder.append("public abstract interface CLIJ2Ops {\n");
-            } else {
+            } else if (platform == PLATFORM_CLIJx) {
                 builder.append("public abstract interface CLIJxOps {\n");
+            } else if (platform == PLATFORM_CLESPERANTOJ_CAMEL) {
+                builder.append("interface CamelInterface extends CommonAPI{\n");
+            } else if (platform == PLATFORM_CLESPERANTOJ_SNAKE) {
+                builder.append("interface SnakeInterface extends CommonAPI {\n");
             }
-            builder.append("   CLIJ getCLIJ();\n");
-            if (isCLIJ2) {
+            if (platform == PLATFORM_CLIJ2) {
+                builder.append("   CLIJ getCLIJ();\n");
                 builder.append("   CLIJ2 getCLIJ2();\n");
-            } else {
+            } else if (platform == PLATFORM_CLIJx){
+                builder.append("   CLIJ getCLIJ();\n");
                 builder.append("   CLIJ2 getCLIJ2();\n");
                 builder.append("   CLIJx getCLIJx();\n");
+            } else {
+                builder.append("   static CLIJ getCLIJ() {\n" +
+                        "       return CLIJ.getInstance();\n" +
+                        "   }\n");
+                builder.append("   static CLIJ2 getCLIJ2() {\n" +
+                        "       return CLIJ2.getInstance();\n" +
+                        "   }\n");
+                builder.append("   static CLIJx getCLIJx() {\n" +
+                               "       return CLIJx.getInstance();\n" +
+                               "   }\n");
+                if (platform == PLATFORM_CLESPERANTOJ_CAMEL) {
+                    builder.append("   static void selectDevice(String deviceName) {\n" +
+                            "       CLIJx.getInstance(deviceName);\n" +
+                            "    }\n");
+                } else {
+                    builder.append("   static void select_device(String device_name) {\n" +
+                            "       CLIJx.getInstance(device_name);\n" +
+                            "    }\n");
+                }
             }
-            builder.append("   boolean doTimeTracing();\n");
-            builder.append("   void recordMethodStart(String method);\n");
-            builder.append("   void recordMethodEnd(String method);\n");
+            if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                builder.append("   boolean doTimeTracing();\n");
+                builder.append("   void recordMethodStart(String method);\n");
+                builder.append("   void recordMethodEnd(String method);\n");
+            }
             builder.append("   \n");
 
 
             int methodCount = 0;
             for (Class klass : CLIJxPlugins.classes) {
                 if (
-                        (klass.getPackage().toString().contains(".clij2.") && isCLIJ2) ||
-                        ((klass == Kernels.class || klass.getPackage().toString().contains(".clijx.")) && !isCLIJ2)
+                        (klass.getPackage().toString().contains(".clij2.") && platform == PLATFORM_CLIJ2) ||
+                        ((klass == Kernels.class || klass.getPackage().toString().contains(".clijx.")) && platform == PLATFORM_CLIJx) ||
+                        (klass != Kernels.class && !klass.getPackage().toString().contains("wrap") && (platform == PLATFORM_CLESPERANTOJ_CAMEL || platform == PLATFORM_CLESPERANTOJ_SNAKE))
                 ) {
                     builder.append("\n    // " + klass.getName() + "\n");
                     builder.append("    //----------------------------------------------------\n");
@@ -152,6 +194,11 @@ public class OpGenerator {
                                 }
                             }
 
+                            if (deprecated && (platform == PLATFORM_CLESPERANTOJ_CAMEL || platform == PLATFORM_CLESPERANTOJ_SNAKE)) {
+                                continue;
+                            }
+
+
                             String documentation = findDocumentation(service, methodName, deprecated);
                             //System.out.println(documentation);
 
@@ -165,8 +212,13 @@ public class OpGenerator {
                             }
 
 
-
-                            builder.append("    default " + returnType + " " + methodName + "(");
+                            if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                builder.append("    default " + returnType + " " + methodName + "(");
+                            } else if (platform == PLATFORM_CLESPERANTOJ_CAMEL){
+                                builder.append("    static " + returnType + " " + methodName + "(");
+                            } else if (platform == PLATFORM_CLESPERANTOJ_SNAKE){
+                                builder.append("    static " + returnType + " " + AssistantUtilities.niceName(methodName).trim().replace(" ", "_").toLowerCase() + "(");
+                            }
                             builder.append(parametersHeader);
                             builder.append(") {\n");
 
@@ -175,13 +227,21 @@ public class OpGenerator {
                             }
 
                             if (returnType.compareTo("void") == 0) {
-                                builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                    builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                }
                                 builder.append("        " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
-                                builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                    builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                }
                             } else {
-                                builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                    builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                }
                                 builder.append("        " + returnType + " result = " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
-                                builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                    builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                }
                                 builder.append("        return result;\n");
                             }
                             builder.append("    }\n\n");
@@ -195,10 +255,14 @@ public class OpGenerator {
             builder.append("// " + methodCount + " methods generated.\n");
 
             File outputTarget;
-            if (isCLIJ2) {
+            if (platform == PLATFORM_CLIJ2) {
                 outputTarget = new File("../clij2/src/main/java/net/haesleinhuepf/clij2/CLIJ2Ops.java");
-            } else {
+            } else if (platform == PLATFORM_CLIJx) {
                 outputTarget = new File("../clijx/src/main/java/net/haesleinhuepf/clijx/utilities/CLIJxOps.java");
+            } else if (platform == PLATFORM_CLESPERANTOJ_CAMEL) {
+                outputTarget = new File("../assistant/src/main/java/net/clesperanto/javaprototype/CamelInterface.java");
+            } else { // if (platform == PLATFORM_CLESPERANTOJ_SNAKE) {
+                outputTarget = new File("../assistant/src/main/java/net/clesperanto/javaprototype/SnakeInterface.java");
             }
             FileWriter writer = new FileWriter(outputTarget);
             writer.write(builder.toString());
