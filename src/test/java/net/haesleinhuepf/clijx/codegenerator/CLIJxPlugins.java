@@ -525,7 +525,10 @@ public interface CLIJxPlugins {
             ExtendedDepthOfFocusTenengradProjection.class,
             ExtendedDepthOfFocusVarianceProjection.class,
             DrawMeshBetweenNClosestLabels.class,
-            DrawMeshBetweenProximalLabels.class
+            DrawMeshBetweenProximalLabels.class,
+            Cosinus.class,
+            Sinus.class,
+            GenerateDistanceMatrixAlongAxis.class
     };
 
     public String blockList = ";" +
