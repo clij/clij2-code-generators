@@ -38,6 +38,7 @@ public class OpGenerator {
             CLIJMacroPluginService service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
 
             StringBuilder builder = new StringBuilder();
+            StringBuilder clEsperantoJcompatibilityList = new StringBuilder();
             if (platform == PLATFORM_CLIJ2) {
                 builder.append("package net.haesleinhuepf.clij2;\n");
                 builder.append("import net.haesleinhuepf.clij2.CLIJ2;\n");
@@ -81,9 +82,9 @@ public class OpGenerator {
             } else if (platform == PLATFORM_CLIJx) {
                 builder.append("public abstract interface CLIJxOps {\n");
             } else if (platform == PLATFORM_CLESPERANTOJ_CAMEL) {
-                builder.append("interface CamelInterface extends CommonAPI{\n");
+                builder.append("abstract class CamelInterface extends CommonAPI{\n");
             } else if (platform == PLATFORM_CLESPERANTOJ_SNAKE) {
-                builder.append("interface SnakeInterface extends CommonAPI {\n");
+                builder.append("abstract class SnakeInterface extends CommonAPI {\n");
             }
             if (platform == PLATFORM_CLIJ2) {
                 builder.append("   CLIJ getCLIJ();\n");
@@ -102,15 +103,6 @@ public class OpGenerator {
                 builder.append("   static CLIJx getCLIJx() {\n" +
                                "       return CLIJx.getInstance();\n" +
                                "   }\n");
-                if (platform == PLATFORM_CLESPERANTOJ_CAMEL) {
-                    builder.append("   static void selectDevice(String deviceName) {\n" +
-                            "       CLIJx.getInstance(deviceName);\n" +
-                            "    }\n");
-                } else {
-                    builder.append("   static void select_device(String device_name) {\n" +
-                            "       CLIJx.getInstance(device_name);\n" +
-                            "    }\n");
-                }
             }
             if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
                 builder.append("   boolean doTimeTracing();\n");
@@ -215,9 +207,10 @@ public class OpGenerator {
                             if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
                                 builder.append("    default " + returnType + " " + methodName + "(");
                             } else if (platform == PLATFORM_CLESPERANTOJ_CAMEL){
-                                builder.append("    static " + returnType + " " + methodName + "(");
+                                builder.append("    public static " + returnType + " " + methodName + "(");
                             } else if (platform == PLATFORM_CLESPERANTOJ_SNAKE){
-                                builder.append("    static " + returnType + " " + AssistantUtilities.niceName(methodName).trim().replace(" ", "_").toLowerCase() + "(");
+                                clEsperantoJcompatibilityList.append(AssistantUtilities.niceName(methodName).trim().replace(" ", "_").toLowerCase() + "\n");
+                                builder.append("    public static " + returnType + " " + AssistantUtilities.niceName(methodName).trim().replace(" ", "_").toLowerCase() + "(");
                             }
                             builder.append(parametersHeader);
                             builder.append(") {\n");
@@ -262,6 +255,12 @@ public class OpGenerator {
             } else if (platform == PLATFORM_CLESPERANTOJ_CAMEL) {
                 outputTarget = new File("../assistant/src/main/java/net/clesperanto/javaprototype/CamelInterface.java");
             } else { // if (platform == PLATFORM_CLESPERANTOJ_SNAKE) {
+
+
+                FileWriter writer = new FileWriter("../assistant/src/main/resources/clEsperantoJ_compatibility.config");
+                writer.write(clEsperantoJcompatibilityList.toString());
+                writer.close();
+
                 outputTarget = new File("../assistant/src/main/java/net/clesperanto/javaprototype/SnakeInterface.java");
             }
             FileWriter writer = new FileWriter(outputTarget);
