@@ -472,7 +472,7 @@ public class DocumentationGenerator {
         return true;
     }
 
-    private static String generateClePythonCode(Class klass, String methodName, String parametersHeader, String parametersCall, String returnType) {
+    public static String generateClePythonCode(Class klass, String methodName, String parametersHeader, String parametersCall, String returnType) {
         if (AssistantUtilities.isCleCompatible(methodName)) {
 
             parametersCall = parametersCall
