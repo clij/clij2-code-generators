@@ -42,14 +42,14 @@ public class PyClEsperantoDocumentationInjector {
         Arrays.sort(allMethods);
 
         for (String clij2macroMethodName : allMethods) {
-            if (clij2macroMethodName.startsWith("CLIJ2_")) {
+            if (clij2macroMethodName.startsWith("CLIJ2_") || clij2macroMethodName.startsWith("CLIJx_")) {
 
                 String name = niceName(clij2macroMethodName);
                 for (String sub_folder : sub_folders) {
                     String filename = pycle_path + sub_folder + "/_" + name + ".py";
-                    System.out.println(filename);
+                    //System.out.println(filename);
                     if (new File(filename).exists()) {
-                        System.out.println("ex " + clij2macroMethodName);
+                        //System.out.println("ex " + clij2macroMethodName);
 
                         String content = new String(Files.readAllBytes(Paths.get(filename)));
                         String orignal_content = content;
@@ -59,7 +59,7 @@ public class PyClEsperantoDocumentationInjector {
                         if (temp.length > 2) {
                             clij2macroMethodName = clij2macroMethodName.split("\\(")[0];
 
-                            System.out.println("cnt" + clij2macroMethodName);
+                            //System.out.println("cnt" + clij2macroMethodName);
 
                             CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(clij2macroMethodName);
 
@@ -138,7 +138,7 @@ public class PyClEsperantoDocumentationInjector {
                             documentation.append(
                                     "References\n" +
                                     "----------\n" +
-                                    ".. [1] https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.replace("CLIJ2_", "") +
+                                    ".. [1] https://clij.github.io/clij2-docs/reference_" + clij2macroMethodName.replace("CLIJ2_", "").replace("CLIJx_", "") +
                                     "\n"
                             );
 
@@ -231,6 +231,7 @@ public class PyClEsperantoDocumentationInjector {
         String result = "";
 
         name = name.replace("CLIJ2_", "");
+        name = name.replace("CLIJx_", "");
         name = name.split("\\(")[0];
 
         for (int i = 0; i < name.length(); i++) {
