@@ -2,6 +2,7 @@ package net.haesleinhuepf.clijx.codegenerator;
 
 import clojure.lang.Compiler;
 import net.haesleinhuepf.clij.CLIJ;
+import net.haesleinhuepf.clij.clearcl.interfaces.ClearCLImageInterface;
 import net.haesleinhuepf.clij.kernels.Kernels;
 import net.haesleinhuepf.clij.macro.CLIJMacroPlugin;
 import net.haesleinhuepf.clij.macro.CLIJMacroPluginService;
@@ -130,6 +131,8 @@ public class OpGenerator {
                                         method.getParameters()[0].getType() == CLIJx.class
                                 ) && blockListOk(klass, method)) {
 
+                            String output_value = null;
+
                             String methodName = method.getName();
                             String returnType = typeToString(method.getReturnType());
                             String parametersHeader = "";
@@ -168,11 +171,20 @@ public class OpGenerator {
                                     parametersHeader = parametersHeader + parameter.getType().getSimpleName() + " " + parameter.getName();
                                     parametersCall = parametersCall + ", " + parameter.getName();
                                 }
+                                if (platform == PLATFORM_CLESPERANTOJ_CAMEL || platform == PLATFORM_CLESPERANTOJ_SNAKE) {
+                                    if (parameter.getType().getSimpleName().contains("ClearCL")) {
+                                        output_value = parameter.getName();
+                                        returnType = parameter.getType().getSimpleName();
+                                    }
+                                }
                             }
 
                             String[] variableNames = guessParameterNames(service, methodName, parametersHeader.split(","));
                             if (variableNames.length > 0) {
                                 for (int i = 0; i < variableNames.length; i++) {
+                                    if (output_value != null) {
+                                        output_value = output_value.replace("arg" + (i + 1), variableNames[i]);
+                                    }
                                     parametersCall = parametersCall.replace("arg" + (i + 1), variableNames[i]);
                                     parametersHeader = parametersHeader.replace("arg" + (i + 1), variableNames[i]);
                                 }
@@ -228,14 +240,25 @@ public class OpGenerator {
                                     builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
                                 }
                             } else {
-                                if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
-                                    builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                if (output_value != null && (platform == PLATFORM_CLESPERANTOJ_SNAKE || platform == PLATFORM_CLESPERANTOJ_CAMEL)) {
+                                    if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                        builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                    }
+                                    builder.append("        " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                                    if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                        builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                    }
+                                    builder.append("        return " + output_value + ";\n");
+                                } else {
+                                    if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                        builder.append("        if (doTimeTracing()) {recordMethodStart(\"" + klass.getSimpleName() + "\");}\n");
+                                    }
+                                    builder.append("        " + returnType + " result = " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
+                                    if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
+                                        builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
+                                    }
+                                    builder.append("        return result;\n");
                                 }
-                                builder.append("        " + returnType + " result = " + klass.getSimpleName() + "." + methodName + "(" + parametersCall + ");\n");
-                                if (platform == PLATFORM_CLIJ2 || platform == PLATFORM_CLIJx) {
-                                    builder.append("        if (doTimeTracing()) {recordMethodEnd(\"" + klass.getSimpleName() + "\");}\n");
-                                }
-                                builder.append("        return result;\n");
                             }
                             builder.append("    }\n\n");
 
