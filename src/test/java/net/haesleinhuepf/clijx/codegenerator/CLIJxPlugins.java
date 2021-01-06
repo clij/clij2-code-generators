@@ -528,7 +528,12 @@ public interface CLIJxPlugins {
             DrawMeshBetweenProximalLabels.class,
             Cosinus.class,
             Sinus.class,
-            GenerateDistanceMatrixAlongAxis.class
+            GenerateDistanceMatrixAlongAxis.class,
+            MaximumDistanceOfTouchingNeighbors.class,
+            MaximumNeighborDistanceMap.class,
+            MinimumNeighborDistanceMap.class,
+            GenerateAngleMatrix.class,
+            NeighborDistanceRangeRatioMap.class
     };
 
     public String blockList = ";" +
