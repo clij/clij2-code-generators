@@ -533,7 +533,12 @@ public interface CLIJxPlugins {
             MaximumNeighborDistanceMap.class,
             MinimumNeighborDistanceMap.class,
             GenerateAngleMatrix.class,
-            NeighborDistanceRangeRatioMap.class
+            NeighborDistanceRangeRatioMap.class,
+            VoronoiOtsuLabeling.class,
+            VisualizeOutlinesOnOriginal.class,
+            FlagLabelsOnEdges.class,
+            MaskedVoronoiLabeling.class,
+            PullToResultsTableColumn.class
     };
 
     public String blockList = ";" +
