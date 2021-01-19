@@ -538,7 +538,9 @@ public interface CLIJxPlugins {
             VisualizeOutlinesOnOriginal.class,
             FlagLabelsOnEdges.class,
             MaskedVoronoiLabeling.class,
-            PullToResultsTableColumn.class
+            PullToResultsTableColumn.class,
+            KMeansLabelClusterer.class,
+            ModeOfTouchingNeighbors.class
     };
 
     public String blockList = ";" +
