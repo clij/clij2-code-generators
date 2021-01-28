@@ -392,8 +392,30 @@ public class DocumentationGenerator {
                 searchForExampleScripts("clij2." + item.methodName, "../clij2-docs/src/main/jython/", "https://github.com/clij/clij2-docs/blob/master/src/main/jython/", "jython") +
                         "";
 
+            String[] pyclesperanto_demo_subfolders = {
+                    "demo/basics",
+                    "demo/napari_gui",
+                    "demo/neighbors",
+                    "demo/segmentation",
+                    "demo/tissues",
+                    "demo/transforms",
+                    "demo/tribolium_morphometry",
+                    "benchmarks"
+            };
+            for (String subfolder : pyclesperanto_demo_subfolders) {
+                linkToExamples = linkToExamples +
+                        searchForExampleScripts("cle." + new PyclesperantoGenerator(false).pythonize(item.methodName), "../pyclesperanto_prototype/" + subfolder + "/", "https://github.com/clEsperanto/pyclesperanto_prototype/tree/master/" + subfolder + "/", "python", ".py");
+            }
+
+
+
+
             String exampleNotebooks =
                     searchForExampleScripts("CLIJ2_" + item.methodName, "../clij2-docs/md/", "https://clij.github.io/clij2-docs/md/", "macro");
+            for (String subfolder : pyclesperanto_demo_subfolders) {
+                exampleNotebooks = exampleNotebooks +
+                        searchForExampleScripts("cle." + new PyclesperantoGenerator(false).pythonize(item.methodName), "../pyclesperanto_prototype/" + subfolder + "/", "https://github.com/clEsperanto/pyclesperanto_prototype/tree/master/" + subfolder + "/", "python", ".ipynb");
+            }
 
 
             if(exampleNotebooks.length() > 0) {
@@ -1044,20 +1066,26 @@ public class DocumentationGenerator {
     }
 
     protected static String searchForExampleScripts(String searchFor, String searchinFolder, String baseLink, String language) {
+        return searchForExampleScripts(searchFor, searchinFolder, baseLink, language, null);
+    }
+
+    protected static String searchForExampleScripts(String searchFor, String searchinFolder, String baseLink, String language, String filename_must_contain) {
         StringBuilder result = new StringBuilder();
-        //System.out.println(searchinFolder);
+        System.out.println(searchinFolder);
         for (File file : new File(searchinFolder).listFiles()) {
-            if (!file.isDirectory()) {
-                String content = readFile(file.getAbsolutePath());
-                if (content.contains(searchFor)) {
-                    result.append("<a href=\"" + baseLink + file.getName() + "\"><img src=\"images/language_" + language + ".png\" height=\"20\"/></a> [" + file.getName() + "](" + baseLink + file.getName() + ")  \n");
-                }
-            } else {
-                File readme = new File(file + "/readme.md");
-                if (readme.exists()) {
-                    String content = readFile(readme.getAbsolutePath());
+            if (filename_must_contain == null || file.getName().contains(filename_must_contain)){
+                if (!file.isDirectory()) {
+                    String content = readFile(file.getAbsolutePath());
                     if (content.contains(searchFor)) {
                         result.append("<a href=\"" + baseLink + file.getName() + "\"><img src=\"images/language_" + language + ".png\" height=\"20\"/></a> [" + file.getName() + "](" + baseLink + file.getName() + ")  \n");
+                    }
+                } else {
+                    File readme = new File(file + "/readme.md");
+                    if (readme.exists()) {
+                        String content = readFile(readme.getAbsolutePath());
+                        if (content.contains(searchFor)) {
+                            result.append("<a href=\"" + baseLink + file.getName() + "\"><img src=\"images/language_" + language + ".png\" height=\"20\"/></a> [" + file.getName() + "](" + baseLink + file.getName() + ")  \n");
+                        }
                     }
                 }
             }
