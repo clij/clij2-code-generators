@@ -549,7 +549,6 @@ public interface CLIJxPlugins {
             ModeOfTouchingNeighborsMap.class,
             StandardDeviationOfTouchingNeighborsMap.class,
             PointIndexListToTouchMatrix.class,
-            GenerateProximalNeighborsMatrix.class,
             GenerateNNearestNeighborsMatrix.class,
             MaximumOfNNearestNeighborsMap.class,
             MinimumOfNNearestNeighborsMap.class,
