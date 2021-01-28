@@ -540,7 +540,27 @@ public interface CLIJxPlugins {
             MaskedVoronoiLabeling.class,
             PullToResultsTableColumn.class,
             KMeansLabelClusterer.class,
-            ModeOfTouchingNeighbors.class
+            ModeOfTouchingNeighbors.class,
+            GenerateProximalNeighborsMatrix.class,
+            ReadIntensitiesFromMap.class,
+            MaximumOfTouchingNeighborsMap.class,
+            MinimumOfTouchingNeighborsMap.class,
+            MeanOfTouchingNeighborsMap.class,
+            ModeOfTouchingNeighborsMap.class,
+            StandardDeviationOfTouchingNeighborsMap.class,
+            PointIndexListToTouchMatrix.class,
+            GenerateProximalNeighborsMatrix.class,
+            GenerateNNearestNeighborsMatrix.class,
+            MaximumOfNNearestNeighborsMap.class,
+            MinimumOfNNearestNeighborsMap.class,
+            MeanOfNNearestNeighborsMap.class,
+            ModeOfNNearestNeighborsMap.class,
+            StandardDeviationOfNNearestNeighborsMap.class,
+            MaximumOfProximalNeighborsMap.class,
+            MinimumOfProximalNeighborsMap.class,
+            MeanOfProximalNeighborsMap.class,
+            ModeOfProximalNeighborsMap.class,
+            StandardDeviationOfProximalNeighborsMap.class,
     };
 
     public String blockList = ";" +
