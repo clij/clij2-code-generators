@@ -560,6 +560,8 @@ public interface CLIJxPlugins {
             MeanOfProximalNeighborsMap.class,
             ModeOfProximalNeighborsMap.class,
             StandardDeviationOfProximalNeighborsMap.class,
+            LabelOverlapCountMap.class,
+            LabelProximalNeighborCountMap.class
     };
 
     public String blockList = ";" +
