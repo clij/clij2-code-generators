@@ -418,6 +418,20 @@ public class OpGenerator {
         return null;
     }
 
+    static String findPluginName(CLIJMacroPluginService service, CLIJMacroPlugin plugin) {
+        if (plugin == null) {
+            return null;
+        }
+
+        for (String name : service.getCLIJMethodNames()) {
+            CLIJMacroPlugin otherPlugin = service.getCLIJMacroPlugin(name);
+            if (otherPlugin != null && otherPlugin.getClass() == plugin.getClass()) {
+                return name;
+            }
+        }
+        return null;
+    }
+
     static String findDocumentation(CLIJMacroPluginService service, String methodName, boolean deprecated) {
         if (methodName.endsWith("IJ")) {
             return "This method is deprecated. Consider using " + methodName.replace("IJ", "Box") + " or " + methodName.replace("IJ", "Sphere") + " instead.";

@@ -13,20 +13,20 @@ import java.util.Set;
 public class DetectMissingMenuEntries {
     public static void main(String[] args) throws IOException {
 
-        String plugins_config = new String(Files.readAllBytes(Paths.get("../clij2/src/main/resources/plugins.config")));
+        String plugins_config = new String(Files.readAllBytes(Paths.get("../clijx/src/main/resources/plugins.config")));
 
         CLIJMacroPluginService service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
 
         String[] methods = getMethods(service);
         Arrays.sort(methods);
         for (String macroMethodName : methods) {
-            if (!macroMethodName.startsWith("CLIJ2")) {
+            if (!macroMethodName.startsWith("CLIJx")) {
                 continue;
             }
             CLIJMacroPlugin plugin = service.getCLIJMacroPlugin(macroMethodName);
             String fullName = plugin.getClass().getCanonicalName();
 
-            if (!plugins_config.contains(fullName)) {
+            if (!plugins_config.contains(fullName) && !fullName.contains("wrapper")) {
                 System.out.println(fullName);
             }
         }

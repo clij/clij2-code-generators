@@ -10,6 +10,8 @@ import net.haesleinhuepf.clij2.utilities.IsCategorized;
 import net.haesleinhuepf.clijx.CLIJx;
 import net.haesleinhuepf.clij2.utilities.HasAuthor;
 import net.haesleinhuepf.clij2.utilities.HasLicense;
+import net.haesleinhuepf.clijx.assistant.scriptgenerator.ClEsperantoSnakeJythonGenerator;
+import net.haesleinhuepf.clijx.assistant.scriptgenerator.ClicGenerator;
 import net.haesleinhuepf.clijx.assistant.scriptgenerator.PyclesperantoGenerator;
 import net.haesleinhuepf.clijx.assistant.utilities.AssistantUtilities;
 import org.scijava.Context;
@@ -19,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -40,6 +43,7 @@ public class DocumentationGenerator {
         String author;
         String license;
         String categories;
+        String pluginName;
     }
 
     private static boolean isCLIJ2;
@@ -126,6 +130,7 @@ public class DocumentationGenerator {
 
                             item.klass = klass;
                             item.methodName = methodName;
+                            item.pluginName = findPluginName(service, plugin);
                             item.parametersJava = parametersHeader;
                             item.parametersHeader = parametersHeader;
                             item.parametersCall = parametersCall;
@@ -225,7 +230,168 @@ public class DocumentationGenerator {
             buildReference(names, methodMap, "CLIc", " compatible with [CLIc](https://github.com/clEsperanto/CLIc_prototype).");
 
             buildIndiviualOperationReferences(names, methodMap);
+
+            buildTranslationTable(methodMap);
+
         }
+    }
+
+    private static void buildTranslationTable(HashMap<String, DocumentationItem> methodMap_) throws IOException {
+
+        HashMap<String, DocumentationItem> methodMap = new HashMap<>();
+        methodMap.putAll(methodMap_);
+
+        StringBuilder dictionary = new StringBuilder();
+        dictionary.append("# The big dictionary\n" +
+                "This list contains the dictionary to translate between clij2, clijx, clEsperantoJ, Macro and pyclesperanto.\n" +
+                "* Methods marked as <span style=\"color:red\">(missing)</span> still need to be translated.\n" +
+                "* Methods marked as <span style=\"color:orange\">(deprecated)</span> should not be translated.\n" +
+                "* Methods marked as <span style=\"color:green\">(experimental)</span> are not decided yet if they become part of a stable release.\n\n");
+
+        ClicGenerator clicGenerator = new ClicGenerator();
+        ClEsperantoSnakeJythonGenerator jythonGenerator = new ClEsperantoSnakeJythonGenerator();
+        PyclesperantoGenerator pythonGenerator = new PyclesperantoGenerator(false);
+
+        String clij2_api = new String(Files.readAllBytes(Paths.get("../clij2/src/main/java/net/haesleinhuepf/clij2/CLIJ2Ops.java")))
+                + new String(Files.readAllBytes(Paths.get("../clij2/src/main/java/net/haesleinhuepf/clij2/CLIJ2.java")));
+
+        String clijx_api = new String(Files.readAllBytes(Paths.get("../clijx/src/main/java/net/haesleinhuepf/clijx/CLIJx.java")))
+                + new String(Files.readAllBytes(Paths.get("../clijx/src/main/java/net/haesleinhuepf/clijx/utilities/CLIJxOps.java")));
+
+        String clic_api = new String(Files.readAllBytes(Paths.get("../CLIc_prototype/clic/include/CLE.h")));
+
+        String clesperantoj_api = new String(Files.readAllBytes(Paths.get("../assistant/src/main/java/net/clesperanto/javaprototype/Snake.java")))
+                + new String(Files.readAllBytes(Paths.get("../assistant/src/main/java/net/clesperanto/javaprototype/SnakeInterface.java")))
+                + new String(Files.readAllBytes(Paths.get("../assistant/src/main/java/net/clesperanto/javaprototype/CommonAPI.java")));
+
+        StringBuilder pyclesperanto_api_builder = new StringBuilder();
+        File pyclesperanto_source = new File("../pyclesperanto_prototype/pyclesperanto_prototype");
+        for (File subfolder : pyclesperanto_source.listFiles()) {
+            if (subfolder.isDirectory()) {
+                for (File file : subfolder.listFiles() ) {
+                    if (file.getName().startsWith("_") && file.getName().endsWith(".py")) {
+                        String file_method = file.getName().substring(1).replace(".py", "");
+                        String content = new String(Files.readAllBytes(Paths.get(file.getPath())));
+                        for (String line : content.split("\n")) {
+                            if (line.startsWith("def ")) {
+                                pyclesperanto_api_builder.append(line.substring(4) + "\n");
+                                boolean haveit = false;
+                                for (String method : methodMap.keySet()) {
+                                    if (pythonGenerator.pythonize(method).compareTo(file_method) == 0) {
+                                        haveit = true;
+                                        break;
+                                    }
+                                }
+                                if (!haveit) {
+                                    DocumentationItem item = new DocumentationItem();
+                                    item.methodName = file_method;
+                                    methodMap.put(item.methodName, item);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        String pyclesperanto_api = pyclesperanto_api_builder.toString();
+
+        ArrayList<String> names = new ArrayList<String>();
+        names.addAll(methodMap.keySet());
+        Collections.sort(names);
+
+        int method_count = 0;
+        String former_method = "";
+        for (String method : names) {
+            if (former_method.compareTo(method) == 0) {
+                continue;
+            }
+            former_method = method;
+
+            DocumentationItem item = methodMap.get(method);
+
+            String clijx_method_name = item.methodName;
+            String clij2_method_name = item.methodName;
+            String pyclesperanto_method_name = pythonGenerator.pythonize(item.methodName);
+            String clesperantoj_method_name = jythonGenerator.pythonize(item.methodName);
+            String clic_method_name = clicGenerator.pythonize(item.methodName);
+            String macro_method_name = item.pluginName;
+
+            if (method.contains("_")) { // methods that only exist in pyclesperanto
+                pyclesperanto_method_name = method;
+            }
+
+
+
+            dictionary.append("## " + pyclesperanto_method_name + "\n");
+            boolean deprecated_or_experimental = false;
+            if (item.description != null && item.description.toLowerCase().contains("deprecated")) {
+                deprecated_or_experimental = true;
+                dictionary.append("<span style=\"color:orange\">(deprecated)</span>\n\n");
+            } else if (getSignatureText("CLIJ2", clij2_method_name, clij2_api, false).contains("Missing")) {
+                deprecated_or_experimental = true;
+                dictionary.append("<span style=\"color:green\">(experimental)</span>\n\n");
+            }
+
+            System.out.println("methods\n---------------------------------------------------");
+            System.out.println("CLIJx: " + clijx_method_name);
+            System.out.println("CLIJ2: " + clij2_method_name);
+            System.out.println("CLIc: " + clic_method_name);
+            System.out.println("clEsperantoJ: " + clesperantoj_method_name);
+            System.out.println("Macro: " + macro_method_name);
+            System.out.println("pyclesperanto: " + pyclesperanto_method_name);
+
+            System.out.println("signature\n---------------------------------------------------");
+
+            dictionary.append(getSignatureText("CLIJ2", clij2_method_name, clij2_api, deprecated_or_experimental));
+            dictionary.append(getSignatureText("CLIJx", clijx_method_name, clijx_api, true)); // we assume all clijx methods are deprecated.
+            dictionary.append(getSignatureText("CLIc", clic_method_name, clic_api, deprecated_or_experimental));
+            dictionary.append(getSignatureText("clEsperantoJ", clesperantoj_method_name, clesperantoj_api, deprecated_or_experimental));
+            if (macro_method_name != null) {
+                dictionary.append("**Macro**\n* Ext." + macro_method_name + "(" + item.parametersMacro + ")\n\n");
+            } else if(!deprecated_or_experimental){
+                dictionary.append("**Macro**\n* <span style=\"color:red\">(Missing)</span>\n\n");
+            }
+            dictionary.append(getSignatureText("pyclesperanto", pyclesperanto_method_name, pyclesperanto_api, deprecated_or_experimental));
+
+
+            method_count ++;
+        }
+        dictionary.append("\n\n" + method_count + " methods listed.");
+
+        //System.out.println(pyclesperanto_api);
+        File outputTarget = new File("../clij2-docs/dictionary_clesperanto.md");
+        FileWriter writer = new FileWriter(outputTarget);
+        writer.write(dictionary.toString());
+        writer.close();
+    }
+
+    private static String getSignatureText(String header, String method_name, String api, boolean deprecated) throws IOException {
+        String signatures = findSignatures(method_name, api);
+        if (signatures.length() > 0) {
+            return ("**" + header + "**\n" + signatures + "\n");
+        } else if (!deprecated) {
+            return("**" + header + "**\n* <span style=\"color:red\">(Missing)</span>\n\n");
+        }
+        return "";
+    }
+
+    private static String findSignatures(String method_name, String search_in_file) {
+        StringBuilder signatures = new StringBuilder();
+
+        for (String line : search_in_file.split("\n")) {
+            line = line.replace("\t", "    ");
+            line = line.replace("public", "");
+            line = line.replace("static", "");
+            line = line.replace("default", "");
+            line = line.replace("{", "");
+            line = line.trim();
+            if ((line.toLowerCase().contains(" " + method_name.toLowerCase() + "(") && !line.startsWith("*")) ||
+                    line.startsWith(method_name + "(") ||
+                    line.startsWith(method_name + " (")) {
+                signatures.append("* " + line + "\n");
+            }
+        }
+        return signatures.toString();
     }
 
     private static void buildIndiviualOperationReferences(ArrayList<String> names, HashMap<String, DocumentationItem> methodMap) throws IOException {

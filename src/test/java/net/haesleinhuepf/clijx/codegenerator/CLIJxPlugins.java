@@ -561,7 +561,18 @@ public interface CLIJxPlugins {
             ModeOfProximalNeighborsMap.class,
             StandardDeviationOfProximalNeighborsMap.class,
             LabelOverlapCountMap.class,
-            LabelProximalNeighborCountMap.class
+            LabelProximalNeighborCountMap.class,
+            ReduceLabelsToLabelEdges.class,
+            OutOfIntensityRange.class,
+            ShrinkLabels.class,
+            Similar.class,
+            Different.class,
+            WekaRegionalLabelClassifier.class,
+            LabelMeanOfLaplacianMap.class,
+            MedianZProjectionMasked.class,
+            MedianTouchPortionMap.class,
+            NeighborCountWithTouchPortionAboveThresholdMap.class,
+            DivideScalarByImage.class
     };
 
     public String blockList = ";" +
