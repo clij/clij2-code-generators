@@ -572,7 +572,9 @@ public interface CLIJxPlugins {
             MedianZProjectionMasked.class,
             MedianTouchPortionMap.class,
             NeighborCountWithTouchPortionAboveThresholdMap.class,
-            DivideScalarByImage.class
+            DivideScalarByImage.class,
+            ReadValuesFromMap.class,
+            ReadValuesFromPositions.class
     };
 
     public String blockList = ";" +
