@@ -20,6 +20,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +29,7 @@ import java.util.*;
 import static net.haesleinhuepf.clijx.codegenerator.OpGenerator.*;
 
 public class DocumentationGenerator {
+
 
     private final static String HTTP_ROOT = "https://clij.github.io/clij2-docs/";
 
@@ -46,6 +48,11 @@ public class DocumentationGenerator {
         String pluginName;
     }
 
+    static float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
+    static int[] integerParameterValues = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170};
+    static boolean[] booleanParameterValues = {true, false, false, true, true, true, true, true, true};
+
+
     private static boolean isCLIJ2;
     private static CLIJMacroPluginService service;
     private static CombinedUsageStats combinedUsageStats;
@@ -53,6 +60,7 @@ public class DocumentationGenerator {
     public static void main(String ... args) throws IOException {
         combinedUsageStats = new CombinedUsageStats("../clij2-docs/src/main/macro/", "../scripts_hidden/", "../scripts/");
         service = new Context(CLIJMacroPluginService.class).getService(CLIJMacroPluginService.class);
+
         boolean[] booleans = new boolean[]{false, true};
 
         for (int b = 0; b < booleans.length; b++) {
@@ -62,7 +70,7 @@ public class DocumentationGenerator {
             String processedNames = ";";
 
             int methodCount = 0;
-            for (Class klass : CLIJxPlugins.classes) {
+            for (Class klass : CLIJxPlugins.both()) {
                 boolean has_static_methods = false;
                 for (Method method : sort(klass.getMethods())) {
                     if (Modifier.isStatic(method.getModifiers()) &&
@@ -258,7 +266,7 @@ public class DocumentationGenerator {
         String clijx_api = new String(Files.readAllBytes(Paths.get("../clijx/src/main/java/net/haesleinhuepf/clijx/CLIJx.java")))
                 + new String(Files.readAllBytes(Paths.get("../clijx/src/main/java/net/haesleinhuepf/clijx/utilities/CLIJxOps.java")));
 
-        String clic_api = new String(Files.readAllBytes(Paths.get("../CLIc_prototype/clic/include/CLE.h")));
+        String clic_api = new String(Files.readAllBytes(Paths.get("../CLIc_prototype/clic/tier0/CLE.h")));
 
         String clesperantoj_api = new String(Files.readAllBytes(Paths.get("../assistant/src/main/java/net/clesperanto/javaprototype/Snake.java")))
                 + new String(Files.readAllBytes(Paths.get("../assistant/src/main/java/net/clesperanto/javaprototype/SnakeInterface.java")))
@@ -474,6 +482,30 @@ public class DocumentationGenerator {
                 }
                 builder.append(linkCategories(list));
             }
+
+            try {
+                String jarname = item.klass.getProtectionDomain().getCodeSource()
+                        .getLocation()
+                        .toURI()
+                        .getPath();
+                System.out.println(jarname);
+                builder.append("\n\nAvailability: ");
+                if (jarname.contains("/clij-core-")) {
+                    builder.append("Available in Fiji by activating the update site clij.\n");
+                } else if (jarname.contains("/clij2_-") || jarname.contains("/clijx_-") || jarname.contains("/clijx-weka_-") ) {
+                    builder.append("Available in Fiji by activating the update sites clij and clij2.\n");
+                } else if (jarname.contains("/clijx-assistant_")) {
+                    builder.append("Available in Fiji by activating the update sites clij, clij2 and clijx-assistant.\n");
+                } else if (jarname.contains("/clijx-assistant-")) {
+                    builder.append("Available in Fiji by activating the update sites clij, clij2 and clijx-assistant-extensions.\n");
+                }
+                String[] temp = jarname.split("/");
+                builder.append("This function is part of " + temp[temp.length - 1] + ".");
+
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+
 
             if (item.klass.getPackage().toString().contains(".clij2.")) {
                 //if (item.methodName.compareTo("generateTouchMatrix") == 0 ) {
@@ -753,9 +785,6 @@ public class DocumentationGenerator {
         parameters = parameters.replace("clijx, ", "");
 
         // just some example numbers for example code
-        float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
-        int[] integerParameterValues = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170};
-        boolean[] booleanParameterValues = {true, false, false, true};
         int floatParameterIndex = 0;
         int integerParameterIndex = 0;
         int booleanParameterIndex = 0;
@@ -856,9 +885,6 @@ public class DocumentationGenerator {
         parameters = parameters.replace("clijx, ", "");
 
         // just some example numbers for example code
-        float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
-        int[] integerParameterValues = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170};
-        boolean[] booleanParameterValues = {true, false, false, true};
         int floatParameterIndex = 0;
         int integerParameterIndex = 0;
         int booleanParameterIndex = 0;
@@ -952,9 +978,6 @@ public class DocumentationGenerator {
         parameters = parameters.replace("clijx, ", "");
 
         // just some example numbers for example code
-        float[] floatParameterValues = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
-        int[] integerParameterValues = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170};
-        boolean[] booleanParameterValues = {true, false, false, true};
         int floatParameterIndex = 0;
         int integerParameterIndex = 0;
         int booleanParameterIndex = 0;
