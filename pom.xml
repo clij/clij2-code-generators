@@ -8,13 +8,13 @@
 	<parent>
 		<groupId>net.haesleinhuepf</groupId>
 		<artifactId>clij-parent-pom</artifactId>
-		<version>2.2.0.21</version>
+		<version>2.2.0.22</version>
 		<relativePath />
 	</parent>
 
 	<groupId>net.haesleinhuepf</groupId>
 	<artifactId>clij2-code_generators_</artifactId>
-	<version>2.2.0.21</version>
+	<version>2.2.0.22</version>
 
 	<name>clij2-code_generators_</name>
 	<description>clij2-code_generators</description>
@@ -101,6 +101,34 @@
 		<dependency>
 			<groupId>net.haesleinhuepf</groupId>
 			<artifactId>clijx-assistant_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-bonej_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-imagej3dsuite_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-morpholibj_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-imagej_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-imagej2_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-imglib2_</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.haesleinhuepf</groupId>
+			<artifactId>clijx-assistant-simpleitk_</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
