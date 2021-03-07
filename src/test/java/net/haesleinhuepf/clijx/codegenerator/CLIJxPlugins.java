@@ -20,6 +20,16 @@ import net.haesleinhuepf.clij2.plugins.AffineTransform3D;
 import net.haesleinhuepf.clij2.plugins.LabelToMask;
 import net.haesleinhuepf.clij2.plugins.MinimumDistanceOfTouchingNeighbors;
 import net.haesleinhuepf.clij2.plugins.SpotsToPointList;
+import net.haesleinhuepf.clijx.bonej.BoneJConnectedComponentsLabeling;
+import net.haesleinhuepf.clijx.bonej.BoneJSkeletonize3D;
+import net.haesleinhuepf.clijx.imagej.ImageJFillHoles;
+import net.haesleinhuepf.clijx.imagej.ImageJGaussianBlur;
+import net.haesleinhuepf.clijx.imagej.ImageJVariance;
+import net.haesleinhuepf.clijx.imagej.ImageJWatershed;
+import net.haesleinhuepf.clijx.imagej2.*;
+import net.haesleinhuepf.clijx.imagej3dsuite.ImageJ3DSuiteConnectedComponentsLabeling;
+import net.haesleinhuepf.clijx.imglib2.Imglib2ConnectedComponentsLabeling;
+import net.haesleinhuepf.clijx.morpholibj.*;
 import net.haesleinhuepf.clijx.plugins.*;
 import net.haesleinhuepf.clijx.plugins.splitstack.AbstractSplitStack;
 import net.haesleinhuepf.clijx.gui.OrganiseWindows;
@@ -46,6 +56,7 @@ import net.haesleinhuepf.clij2.plugins.LocalThreshold;
 import net.haesleinhuepf.clij2.plugins.GaussianBlur2D;
 import net.haesleinhuepf.clij2.plugins.GaussianBlur3D;
 import net.haesleinhuepf.clijx.plugins.BlurSliceBySlice;
+import net.haesleinhuepf.clijx.simpleitk.*;
 import net.haesleinhuepf.clijx.weka.*;
 import net.haesleinhuepf.clijx.weka.autocontext.ApplyAutoContextWekaModel;
 import net.haesleinhuepf.clijx.weka.autocontext.TrainAutoContextWekaModel;
@@ -574,7 +585,90 @@ public interface CLIJxPlugins {
             NeighborCountWithTouchPortionAboveThresholdMap.class,
             DivideScalarByImage.class,
             ReadValuesFromMap.class,
-            ReadValuesFromPositions.class
+            ReadValuesFromPositions.class,
+            ZPositionOfMinimumZProjection.class,
+            LocalThresholdPhansalkar.class
+
+    };
+
+    static Class[] both() {
+        Class[] all = new Class[classes.length + extensions.length];
+        int i = 0;
+        for (int j = 0; j < classes.length; j++, i++) {
+            all[i] = classes[j];
+        }
+        for (int j = 0; j < extensions.length; j++, i++) {
+            all[i] = extensions[j];
+        }
+        return all;
+    }
+
+    public Class[] extensions = {
+
+            // extensions
+            ImageJFillHoles.class,
+            ImageJGaussianBlur.class,
+            ImageJVariance.class,
+            ImageJWatershed.class,
+
+            ImageJ3DSuiteConnectedComponentsLabeling.class,
+
+            Imglib2ConnectedComponentsLabeling.class,
+
+            ImageJ2FrangiVesselness.class,
+            ImageJ2GaussianBlur.class,
+            ImageJ2MedianBox.class,
+            ImageJ2MedianSphere.class,
+            ImageJ2RichardsonLucyDeconvolution.class,
+            ImageJ2Tubeness.class,
+
+            BoneJConnectedComponentsLabeling.class,
+            BoneJSkeletonize3D.class,
+
+            ConvertToFloat.class,
+            ConvertToUnsignedByte.class,
+            ConvertToUnsignedShort.class,
+            SimpleITKBilateral.class,
+            SimpleITKBinaryFillHole.class,
+            SimpleITKBinaryPruning.class,
+            SimpleITKBinaryThinning.class,
+            SimpleITKBinomialBlur.class,
+            SimpleITKBoundedReciprocal.class,
+            SimpleITKCannyEdgeDetection.class,
+            SimpleITKConnectedComponent.class,
+            SimpleITKConnectedComponent.class,
+            SimpleITKDanielssonDistanceMap.class,
+            SimpleITKDiscreteGaussian.class,
+            SimpleITKFFTConvolution.class,
+            SimpleITKHMaxima.class,
+            SimpleITKInverseDeconvolution.class,
+            SimpleITKLandweberDeconvolution.class,
+            SimpleITKMedian.class,
+            SimpleITKMedianProjection.class,
+            SimpleITKMorphologicalWatershed.class,
+            SimpleITKOtsuMultipleThresholds.class,
+            SimpleITKOtsuThreshold.class,
+            SimpleITKRichardsonLucyDeconvolution.class,
+            SimpleITKTikhonovDeconvolution.class,
+            SimpleITKWienerDeconvolution.class,
+            SimpleITKZeroCrossing.class,
+
+            SimpleITKZeroCrossingBasedEdgeDetection.class,
+
+            MorphoLibJChamferDistanceMap.class,
+            MorphoLibJClassicWatershed.class,
+            MorphoLibJChamferDistanceMap.class,
+            MorphoLibJFillHoles.class,
+            MorphoLibJFloodFillComponentsLabeling.class,
+            MorphoLibJKeepLargestRegion.class,
+            MorphoLibJMarkerControlledWatershed.class,
+            MorphoLibJMorphologicalSegmentationLabelBorderImage.class,
+            MorphoLibJMorphologicalSegmentationLabelObjectImage.class,
+            MorphoLibJRemoveBorderLabels.class,
+            MorphoLibJRemoveLargestRegion.class,
+            MorphoLibJExtendedMinima.class,
+            MorphoLibJExtendedMaxima.class
+
     };
 
     public String blockList = ";" +
