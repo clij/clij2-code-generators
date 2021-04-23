@@ -587,7 +587,21 @@ public interface CLIJxPlugins {
             ReadValuesFromMap.class,
             ReadValuesFromPositions.class,
             ZPositionOfMinimumZProjection.class,
-            LocalThresholdPhansalkar.class
+            LocalThresholdPhansalkar.class,
+            LocalThresholdBernsen.class,
+            LocalThresholdContrast.class,
+            LocalThresholdMean.class,
+            LocalThresholdMedian.class,
+            LocalThresholdMidGrey.class,
+            LocalThresholdNiblack.class,
+            LocalThresholdSauvola.class,
+            ColorDeconvolution.class,
+            GreyscaleOpeningBox.class,
+            GreyscaleOpeningSphere.class,
+            GreyscaleClosingBox.class,
+            GreyscaleClosingSphere.class,
+            ProximalNeighborCountMap.class,
+            SubStack.class
 
     };
 
