@@ -1211,6 +1211,12 @@ public class DocumentationGenerator {
         int methodCount = 0;
         for (String name : names) {
             DocumentationItem item = methodMap.get(name);
+            if (item.klass.getPackage().toString().contains("wrapper")) {
+                continue;
+            }
+            if (item.description.toLowerCase().contains("deprecated")) {
+                continue;
+            }
             if (
                     (isCLIJ2 && item.klass.getPackage().toString().contains(".clij2.")) ||
                     ((!isCLIJ2) && (item.klass.getPackage().toString().contains(".clijx.") || item.klass.getPackage().toString().contains(".clij2.")))
