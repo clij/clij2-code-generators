@@ -1214,7 +1214,7 @@ public class DocumentationGenerator {
             if (item.klass.getPackage().toString().contains("wrapper")) {
                 continue;
             }
-            if (item.description.toLowerCase().contains("deprecated")) {
+            if (item.description != null && item.description.toLowerCase().contains("deprecated")) {
                 continue;
             }
             if (
